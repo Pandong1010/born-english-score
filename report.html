@@ -43,7 +43,8 @@
 					}
 					.btn-share:hover { background-color: #F4DC00; }
 
-					.nav-links { display: flex; justify-content: center; margin-top: 25px; }
+					/* 🚨 하단 이동 링크 스타일 수정 (양쪽으로 벌어지게 세팅) */
+					.nav-links { display: flex; justify-content: space-between; margin-top: 25px; padding: 0 10px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
 					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
 				</style>
@@ -83,14 +84,15 @@
 					누적 평균: 데이터를 불러오는 중...
 				</div>
 
-				<!-- 카카오톡 색상으로 버튼 디자인도 살짝 바꿨습니다 -->
 				<button class="btn-share" onclick="copyParentLink()">
 					💬 학부모님용 카톡 링크 자동 복사하기
 				</button>
 			</div>
 
+			<!-- 🚨 양쪽으로 이동할 수 있는 메뉴 버튼 두 개 배치 -->
 			<div class="nav-links">
-				<a href="index.html">← 점수 입력 화면으로 돌아가기</a>
+				<a href="manage.html">⚙️ 반/학생 관리</a>
+				<a href="index.html">← 점수 입력으로 돌아가기</a>
 			</div>
 		</div>
 
@@ -106,12 +108,10 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
-			// 🚨 새로 추가된 기능: 주소창에서 이름 넘겨받기!
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
 			const studentNameFromUrl = urlParams.get('studentName');
 
-			// 점수 입력 화면에서 곧바로 넘어왔다면 알아서 검색까지 쫙!
 			if (studentNameFromUrl) {
 			document.getElementById('searchName').value = studentNameFromUrl;
 			searchReport();
@@ -171,7 +171,6 @@
 			});
 			}
 
-			// 🚨 진짜진짜 중요한 링크 자동 복사 기능 🚨
 			function copyParentLink() {
 			const name = document.getElementById('searchName').value.trim();
 			if (!name) { alert("먼저 학생 이름을 검색해 주세요."); return; }
@@ -179,11 +178,9 @@
 			const currentUrl = window.location.href.split('report.html')[0].split('?')[0];
 			const finalLink = `${currentUrl}parent.html?name=${encodeURIComponent(name)}`;
 
-			// 컴퓨터 클립보드에 몰래 'Ctrl+C' 해주는 마법의 코드
 			navigator.clipboard.writeText(finalLink).then(() => {
 			alert(`✅ 링크가 자동으로 복사되었습니다!\n\n이제 카카오톡 채팅창에 '붙여넣기'만 하시면 됩니다.`);
 			}).catch(err => {
-			// 혹~시라도 구형 핸드폰이라 자동 복사가 안 먹힐 때를 대비한 보험 (직접 복사 가능하게 창 띄움)
 			prompt("자동 복사가 차단되었습니다. 아래 주소를 직접 복사(Ctrl+C)해 주세요:", finalLink);
 			});
 			}
