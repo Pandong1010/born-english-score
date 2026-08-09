@@ -44,15 +44,16 @@
 
 					.empty-msg { text-align: center; font-size: 13px; color: #94A3B8; padding: 10px 0; }
 
-					/* 반 태그 스타일 */
 					.class-tag {
 					background:#E2E8F0; padding:6px 12px; border-radius:15px;
 					font-size:13px; font-weight:bold; color:#475569;
 					display:flex; align-items:center; gap:8px;
 					}
-					.class-delete-btn {
-					color: #EF4444; cursor: pointer; font-weight: 900;
-					}
+					.class-delete-btn { color: #EF4444; cursor: pointer; font-weight: 900; }
+
+					/* 🚨 클릭할 수 있는 학생 이름 스타일 추가 */
+					.student-link { cursor: pointer; color: #2B4C7E; text-decoration: underline; text-underline-offset: 4px; }
+					.student-link:hover { color: #1E3A8A; font-weight: 700; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -66,19 +67,15 @@
 				<div class="brand-subtitle">반 & 학생 관리 시스템</div>
 			</header>
 
-			<!-- 반 생성 구역 -->
 			<div class="section-title">🏫 반 만들기</div>
 			<div class="card">
 				<div class="input-group">
 					<input type="text" id="newClassName" placeholder="새로운 반 이름 (예: 파닉스 A반)">
 						<button class="btn-primary" onclick="addClass()">반 추가</button>
 					</div>
-				<div id="classListMenu" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-					<!-- 생성된 반들이 태그처럼 표시됩니다 -->
-				</div>
+				<div id="classListMenu" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
 			</div>
 
-			<!-- 학생 관리 구역 -->
 			<div class="section-title">🧑‍🎓 학생 관리 (추가/수정/삭제)</div>
 			<div class="card">
 				<div class="input-group">
@@ -114,15 +111,11 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
-			window.onload = function() {
-			loadClasses();
-			};
+			window.onload = function() { loadClasses(); };
 
-			// 반 추가
 			function addClass() {
 			const className = document.getElementById('newClassName').value.trim();
 			if (!className) return alert("반 이름을 입력해주세요!");
-
 			db.collection("classes").add({
 			name: className,
 			createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -132,7 +125,6 @@
 			});
 			}
 
-			// 반 목록 불러오기 (+ 반 삭제 버튼 추가)
 			function loadClasses() {
 			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
 			const classSelector = document.getElementById('classSelector');
@@ -154,9 +146,8 @@
 			});
 			}
 
-			// 🚨 새로 추가된 기능: 반 삭제
 			function deleteClass(classId, className) {
-			if(confirm(`정말로 '${className}'을(를) 삭제하시겠습니까?\n(주의: 반을 지워도 이미 소속된 학생들의 성적 데이터는 남아있습니다)`)) {
+			if(confirm(`정말로 '${className}'을(를) 삭제하시겠습니까?`)) {
 			db.collection("classes").doc(classId).delete().then(() => {
 			loadClasses();
 			document.getElementById('studentList').innerHTML = '<div class="empty-msg">반을 선택하면 학생 목록이 나타납니다.</div>';
@@ -164,11 +155,9 @@
 			}
 			}
 
-			// 학생 추가
 			function addStudent() {
 			const classId = document.getElementById('classSelector').value;
 			const studentName = document.getElementById('newStudentName').value.trim();
-
 			if (!classId) return alert("먼저 반을 선택해주세요!");
 			if (!studentName) return alert("학생 이름을 입력해주세요!");
 
@@ -182,7 +171,6 @@
 			});
 			}
 
-			// 학생 목록 불러오기 (🚨 복합 인덱스 에러를 방지하기 위해 orderBy 제거)
 			function loadStudents() {
 			const classId = document.getElementById('classSelector').value;
 			const studentList = document.getElementById('studentList');
@@ -194,8 +182,7 @@
 
 			studentList.innerHTML = '<div class="empty-msg">학생 목록을 불러오는 중...</div>';
 
-			db.collection("students").where("classId", "==", classId).get()
-			.then((snapshot) => {
+			db.collection("students").where("classId", "==", classId).get().then((snapshot) => {
 			if (snapshot.empty) {
 			studentList.innerHTML = '<div class="empty-msg">이 반에는 아직 등록된 학생이 없습니다.</div>';
 			return;
@@ -206,7 +193,10 @@
 			const data = doc.data();
 			studentList.innerHTML += `
 			<div class="list-item">
-				<span>${data.name}</span>
+				<!-- 🚨 클릭하면 index.html로 정보를 싸들고 넘어가는 기능 추가 -->
+				<span class="student-link" onclick="goToInputScore('${classId}', '${data.name}')">
+					📝 ${data.name} (점수입력)
+				</span>
 				<div class="action-btns">
 					<button class="btn-edit" onclick="editStudent('${doc.id}', '${data.name}')">수정</button>
 					<button class="btn-delete" onclick="deleteStudent('${doc.id}', '${data.name}')">삭제</button>
@@ -214,31 +204,25 @@
 			</div>
 			`;
 			});
-			})
-			.catch((error) => {
-			console.error("에러 발생:", error);
-			studentList.innerHTML = `<div class="empty-msg" style="color:red;">데이터를 불러오는 중 오류가 발생했습니다.</div>`;
 			});
 			}
 
-			// 학생 수정
+			// 🚨 새로 추가된 페이지 이동 함수
+			function goToInputScore(classId, studentName) {
+			// 주소창 뒤에 물음표(?)를 붙이고 반 아이디와 학생 이름을 숨겨서 보냅니다.
+			window.location.href = `index.html?classId=${classId}&studentName=${encodeURIComponent(studentName)}`;
+			}
+
 			function editStudent(studentId, currentName) {
 			const newName = prompt("수정할 학생의 이름을 입력해주세요:", currentName);
 			if (newName && newName.trim() !== "" && newName !== currentName) {
-			db.collection("students").doc(studentId).update({
-			name: newName.trim()
-			}).then(() => {
-			loadStudents();
-			});
+			db.collection("students").doc(studentId).update({ name: newName.trim() }).then(() => { loadStudents(); });
 			}
 			}
 
-			// 학생 삭제
 			function deleteStudent(studentId, studentName) {
 			if (confirm(`정말로 '${studentName}' 학생을 삭제하시겠습니까?`)) {
-			db.collection("students").doc(studentId).delete().then(() => {
-			loadStudents();
-			});
+			db.collection("students").doc(studentId).delete().then(() => { loadStudents(); });
 			}
 			}
 		</script>
