@@ -38,7 +38,7 @@
 
 					.nav-links { display: flex; justify-content: space-between; padding: 0 10px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
-					.nav-links a:hover { color: #2B4C7E; }
+					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -108,7 +108,6 @@
 			document.getElementById('testDate').valueAsDate = new Date();
 
 			window.onload = function() {
-			// 🚨 주소창에 숨겨서 보내온 정보(파라미터)를 읽어옵니다.
 			const urlParams = new URLSearchParams(window.location.search);
 			const preSelectClassId = urlParams.get('classId');
 			const preSelectStudentName = urlParams.get('studentName');
@@ -120,15 +119,13 @@
 			classSelector.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
 			});
 
-			// 만약 주소창에 반 정보가 있다면, 그 반을 바로 선택하고 학생 목록을 부릅니다!
 			if (preSelectClassId) {
 			classSelector.value = preSelectClassId;
-			loadStudents(preSelectStudentName); // 넘겨받은 학생 이름도 같이 전달
+			loadStudents(preSelectStudentName);
 			}
 			});
 			};
 
-			// 🚨 autoSelectName 이라는 숨겨진 변수를 추가했습니다.
 			function loadStudents(autoSelectName = null) {
 			const classId = document.getElementById('classSelector').value;
 			const studentSelector = document.getElementById('studentSelector');
@@ -147,13 +144,13 @@
 			studentSelector.innerHTML += `<option value="${data.name}">${data.name}</option>`;
 			});
 
-			// 학생 목록을 다 불러온 뒤, 아까 넘겨받은 학생 이름이 있다면 바로 선택(고정)해 줍니다!
 			if (typeof autoSelectName === 'string' && autoSelectName) {
 			studentSelector.value = autoSelectName;
 			}
 			});
 			}
 
+			// 🚨 새로워진 점수 저장 및 중복 방지 기능!
 			function saveScore() {
 			const name = document.getElementById('studentSelector').value;
 			const date = document.getElementById('testDate').value;
@@ -169,24 +166,57 @@
 			return;
 			}
 
+			// 1. 해당 학생의 이름과 오늘 날짜로 저장된 기록이 있는지 데이터베이스를 뒤져봅니다.
+			db.collection("scores")
+			.where("name", "==", name)
+			.where("date", "==", date)
+			.get()
+			.then((querySnapshot) => {
+			if (!querySnapshot.empty) {
+			// 2-A. 이미 데이터가 있다면 원장님께 덮어쓸지 물어봅니다.
+			const isUpdate = confirm(`⚠️ ${date} 날짜에 이미 '${name}' 학생의 성적이 있습니다.\n입력하신 점수(${score}점)로 수정하시겠습니까?`);
+
+			if (isUpdate) {
+			// 찾은 기존 데이터의 고유번호(ID)를 가져와서 덮어쓰기(update)를 실행합니다.
+			const docId = querySnapshot.docs[0].id;
+			db.collection("scores").doc(docId).update({
+			maxScore: Number(maxScore),
+			score: Number(score),
+			timestamp: firebase.firestore.FieldValue.serverTimestamp()
+			}).then(() => {
+			showSuccessPopup(name, "수정");
+			}).catch((error) => {
+			alert("수정 중 오류가 발생했습니다: " + error.message);
+			});
+			}
+			} else {
+			// 2-B. 데이터가 없다면 평소처럼 새롭게 저장(add)합니다.
 			db.collection("scores").add({
 			name: name,
 			date: date,
 			maxScore: Number(maxScore),
 			score: Number(score),
 			timestamp: firebase.firestore.FieldValue.serverTimestamp()
-			})
-			.then(function() {
-			if(confirm(name + " 학생의 점수가 저장되었습니다! 🎉\n\n성적 결과 화면으로 이동하시겠습니까?")) {
-			window.location.href = "report.html";
-			} else {
-			document.getElementById('studentSelector').value = '';
-			document.getElementById('score').value = '';
-			}
-			})
-			.catch(function(error) {
+			}).then(() => {
+			showSuccessPopup(name, "저장");
+			}).catch((error) => {
 			alert("저장 중 오류가 발생했습니다: " + error.message);
 			});
+			}
+			}).catch((error) => {
+			alert("중복 데이터 확인 중 오류가 발생했습니다: " + error.message);
+			});
+			}
+
+			// 🚨 완료 팝업창 및 화면 이동을 담당하는 함수
+			function showSuccessPopup(name, actionWord) {
+			if (confirm(`${name} 학생의 점수가 성공적으로 ${actionWord}되었습니다! 🎉\n\n성적 결과 화면으로 이동하시겠습니까?`)) {
+			// 결과 화면으로 갈 때, 학생 이름을 주소창에 달아서 넘겨줍니다 (자동 검색 기능!)
+			window.location.href = "report.html?studentName=" + encodeURIComponent(name);
+			} else {
+			// 이 화면에 남을 거면 점수 입력칸만 비워줍니다. (연속 입력 편리성 유지)
+			document.getElementById('score').value = '';
+			}
 			}
 		</script>
 	</body>

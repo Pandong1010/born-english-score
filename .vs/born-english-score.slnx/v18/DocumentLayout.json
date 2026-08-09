@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\report.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:report.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\index.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:index.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\report.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:report.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\manage.html||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
@@ -22,11 +22,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "report.html",
               "DocumentMoniker": "C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\report.html",
               "RelativeDocumentMoniker": "report.html",
@@ -39,15 +39,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "index.html",
               "DocumentMoniker": "C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\index.html",
               "RelativeDocumentMoniker": "index.html",
               "ToolTip": "C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\index.html",
               "RelativeToolTip": "index.html",
-              "ViewState": "AgIAAKYAAAAAAAAAAAAEwMAAAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAMQAAAAAAAAAAAAEwN4AAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-08-09T14:44:31.873Z"
+              "WhenOpened": "2026-08-09T14:44:31.873Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
