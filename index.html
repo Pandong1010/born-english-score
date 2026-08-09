@@ -5,107 +5,44 @@
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<title>BORN 영어학원 월간 리포트</title>
 				<style>
-					/* 전체 배경 및 폰트 설정 */
 					body {
-					margin: 0;
-					padding: 0;
+					margin: 0; padding: 0;
 					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-					background-color: #F8F9FA;
-					color: #333333;
-					display: flex;
-					justify-content: center;
+					background-color: #F8F9FA; color: #333333;
+					display: flex; justify-content: center;
 					}
-
-					/* 모바일 앱 화면 비율에 맞춘 중앙 컨테이너 */
 					.app-container {
-					width: 100%;
-					max-width: 480px;
-					min-height: 100vh;
-					background-color: #FFFFFF;
-					box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-					padding: 24px 20px;
-					box-sizing: border-box;
+					width: 100%; max-width: 480px; min-height: 100vh;
+					background-color: #FFFFFF; box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+					padding: 24px 20px; box-sizing: border-box;
 					}
+					header { text-align: center; margin-bottom: 28px; }
+					.brand-title { font-size: 20px; font-weight: 700; color: #2B4C7E; letter-spacing: 1px; margin: 0; }
+					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
 
-					header {
-					text-align: center;
-					margin-bottom: 28px;
+					.card { background-color: #FFFFFF; border: 1px solid #E9ECEF; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+					.score-row { display: flex; gap: 10px; }
+					.score-row .form-group { flex: 1; }
+					.form-group { margin-bottom: 16px; }
+					.form-group label { display: block; font-size: 13px; font-weight: 600; color: #495057; margin-bottom: 6px; }
+					.form-group input, .form-group select {
+					width: 100%; padding: 12px; font-size: 15px;
+					border: 1px solid #CED4DA; border-radius: 8px; box-sizing: border-box; outline: none;
 					}
-
-					.brand-title {
-					font-size: 20px;
-					font-weight: 700;
-					color: #2B4C7E;
-					letter-spacing: 1px;
-					margin: 0;
-					}
-
-					.brand-subtitle {
-					font-size: 13px;
-					color: #6C757D;
-					margin-top: 4px;
-					}
-
-					.card {
-					background-color: #FFFFFF;
-					border: 1px solid #E9ECEF;
-					border-radius: 12px;
-					padding: 20px;
-					margin-bottom: 20px;
-					}
-
-					.score-row {
-					display: flex;
-					gap: 10px;
-					}
-					.score-row .form-group {
-					flex: 1;
-					}
-
-					.form-group {
-					margin-bottom: 16px;
-					}
-
-					.form-group label {
-					display: block;
-					font-size: 13px;
-					font-weight: 600;
-					color: #495057;
-					margin-bottom: 6px;
-					}
-
-					.form-group input {
-					width: 100%;
-					padding: 12px;
-					font-size: 15px;
-					border: 1px solid #CED4DA;
-					border-radius: 8px;
-					box-sizing: border-box;
-					outline: none;
-					}
-
-					.form-group input:focus {
-					border-color: #2B4C7E;
-					}
+					.form-group input:focus, .form-group select:focus { border-color: #2B4C7E; }
 
 					.btn-submit {
-					width: 100%;
-					padding: 14px;
-					font-size: 15px;
-					font-weight: 600;
-					color: #FFFFFF;
-					background-color: #2B4C7E;
-					border: none;
-					border-radius: 8px;
-					cursor: pointer;
+					width: 100%; padding: 14px; font-size: 15px; font-weight: 600; color: #FFFFFF;
+					background-color: #2B4C7E; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;
 					}
+					.btn-submit:hover { background-color: #1A3256; }
 
-					.btn-submit:hover {
-					background-color: #1A3256;
-					}
+					/* 하단 이동 링크 스타일 */
+					.nav-links { display: flex; justify-content: space-between; padding: 0 10px; }
+					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
+					.nav-links a:hover { color: #2B4C7E; }
 				</style>
 
-				<!-- 🚀 구글 파이어베이스 기능을 가져오는 마법의 줄입니다 -->
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 			</head>
@@ -114,39 +51,54 @@
 		<div class="app-container">
 			<header>
 				<h1 class="brand-title">BORN 영어학원</h1>
-				<div class="brand-subtitle">매일 단어 시험 월간 리포트</div>
+				<div class="brand-subtitle">매일 단어 시험 성적 입력</div>
 			</header>
 
 			<main>
 				<div class="card">
+					<!-- 새롭게 추가된 반/학생 선택 구역 -->
 					<div class="form-group">
-						<label for="studentName">학생 이름</label>
-						<input type="text" id="studentName" placeholder="예: 김철수">
-        </div>
+						<label>반 선택</label>
+						<select id="classSelector" onchange="loadStudents()">
+							<option value="">먼저 반을 선택해주세요</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>학생 선택</label>
+						<select id="studentSelector">
+							<option value="">학생을 선택해주세요</option>
+						</select>
+					</div>
 
 					<div class="form-group">
-						<label for="testDate">시험 날짜</label>
+						<label>시험 날짜</label>
 						<input type="date" id="testDate">
-        </div>
+                </div>
 
 					<div class="score-row">
 						<div class="form-group">
-							<label for="maxScore">만점 기준</label>
-							<input type="number" id="maxScore" placeholder="예: 100">
-          </div>
+							<label>만점 기준</label>
+							<!-- 매번 쓰기 귀찮으시지 않게 기본값 100을 넣어두었습니다 -->
+							<input type="number" id="maxScore" value="100">
+                    </div>
 						<div class="form-group">
-							<label for="score">획득 점수</label>
+							<label>획득 점수</label>
 							<input type="number" id="score" placeholder="예: 95">
-          </div>
+                    </div>
 					</div>
 
 					<button class="btn-submit" onclick="saveScore()">오늘 점수 저장하기</button>
+				</div>
+
+				<!-- 하단에 다른 페이지로 쉽게 이동할 수 있는 버튼 추가 -->
+				<div class="nav-links">
+					<a href="manage.html">⚙️ 반/학생 관리</a>
+					<a href="report.html">📊 성적 결과 확인</a>
 				</div>
 			</main>
 		</div>
 
 		<script>
-			// 1. 발급받으신 비밀 열쇠를 넣었습니다!
 			const firebaseConfig = {
 			apiKey: "AIzaSyCti-4AKWT9kbq_a-HEy0AI-CwfxiZ5Msw",
 			authDomain: "bornacademy-713f5.firebaseapp.com",
@@ -155,22 +107,53 @@
 			messagingSenderId: "767227866395",
 			appId: "1:767227866395:web:b0e0e22a1b21a52d10b7be"
 			};
-
-			// 2. 파이어베이스 창고 문을 엽니다.
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
-			// 오늘 날짜 자동 입력
 			document.getElementById('testDate').valueAsDate = new Date();
 
+			// 1. 화면이 켜지면 반 목록을 자동으로 불러옵니다
+			window.onload = function() {
+			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
+			const classSelector = document.getElementById('classSelector');
+			snapshot.forEach((doc) => {
+			const data = doc.data();
+			classSelector.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
+			});
+			});
+			};
+
+			// 2. 반을 선택하면 해당 반의 학생 목록을 불러옵니다
+			function loadStudents() {
+			const classId = document.getElementById('classSelector').value;
+			const studentSelector = document.getElementById('studentSelector');
+
+			if (!classId) {
+			studentSelector.innerHTML = '<option value="">학생을 선택해주세요</option>';
+			return;
+			}
+
+			studentSelector.innerHTML = '<option value="">불러오는 중...</option>';
+
+			db.collection("students").where("classId", "==", classId).get().then((snapshot) => {
+			studentSelector.innerHTML = '<option value="">학생을 선택해주세요</option>';
+			snapshot.forEach((doc) => {
+			const data = doc.data();
+			// 이름으로 성적을 검색하므로 value에 학생 이름을 넣습니다
+			studentSelector.innerHTML += `<option value="${data.name}">${data.name}</option>`;
+			});
+			});
+			}
+
+			// 3. 점수 저장 기능 (+ 결과창 이동 로직 추가)
 			function saveScore() {
-			const name = document.getElementById('studentName').value;
+			const name = document.getElementById('studentSelector').value;
 			const date = document.getElementById('testDate').value;
 			const maxScore = document.getElementById('maxScore').value;
 			const score = document.getElementById('score').value;
 
 			if (!name || !date || !maxScore || !score) {
-			alert("이름, 날짜, 만점 기준, 획득 점수를 모두 입력해 주세요!");
+			alert("학생, 날짜, 만점 기준, 획득 점수를 모두 입력해 주세요!");
 			return;
 			}
 
@@ -179,7 +162,6 @@
 			return;
 			}
 
-			// 3. 데이터를 모아서 진짜 구글 창고(scores 라는 이름의 폴더)로 전송합니다!
 			db.collection("scores").add({
 			name: name,
 			date: date,
@@ -188,16 +170,18 @@
 			timestamp: firebase.firestore.FieldValue.serverTimestamp()
 			})
 			.then(function() {
-			alert(name + " 학생의 점수가 데이터베이스에 안전하게 저장되었습니다! 🎉");
-			// 원장님이 다음 학생을 바로 입력하기 편하게 이름과 점수 칸만 비워줍니다.
-			document.getElementById('studentName').value = '';
+			// 저장 성공 후 화면 이동 여부를 묻는 창을 띄웁니다
+			if(confirm(name + " 학생의 점수가 저장되었습니다! 🎉\n\n성적 결과 화면으로 이동하시겠습니까?\n(취소를 누르면 다음 학생 점수를 계속 입력할 수 있습니다.)")) {
+			window.location.href = "report.html"; // 확인 누르면 이동
+			} else {
+			document.getElementById('studentSelector').value = ''; // 취소 누르면 이름/점수 칸만 초기화
 			document.getElementById('score').value = '';
+			}
 			})
 			.catch(function(error) {
 			alert("저장 중 오류가 발생했습니다: " + error.message);
 			});
 			}
 		</script>
-
 	</body>
 </html>
