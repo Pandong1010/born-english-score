@@ -21,9 +21,16 @@
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
 					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
 
-					.search-box { display: flex; gap: 8px; margin-bottom: 20px; }
-					.search-box input { flex: 1; padding: 12px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 8px; outline: none; }
-					.search-box button { padding: 0 16px; font-size: 14px; font-weight: 600; color: #FFF; background-color: #1E3A8A; border: none; border-radius: 8px; cursor: pointer; }
+					/* 🚨 검색 박스를 드롭다운 2개와 버튼이 잘 어울리게 수정했습니다 */
+					.search-box { display: flex; gap: 6px; margin-bottom: 20px; }
+					.search-box select {
+					flex: 1; padding: 10px; font-size: 13px;
+					border: 1px solid #D1D5DB; border-radius: 8px; outline: none;
+					}
+					.search-box button {
+					padding: 0 14px; font-size: 13px; font-weight: 600; color: #FFF;
+					background-color: #1E3A8A; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap;
+					}
 
 					.calendar-container { display: none; margin-top: 20px; }
 					.month-title { text-align: center; font-size: 16px; font-weight: bold; color: #374151; margin-bottom: 10px; }
@@ -43,7 +50,6 @@
 					}
 					.btn-share:hover { background-color: #F4DC00; }
 
-					/* 🚨 하단 이동 링크 스타일 수정 (양쪽으로 벌어지게 세팅) */
 					.nav-links { display: flex; justify-content: space-between; margin-top: 25px; padding: 0 10px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
 					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
@@ -60,10 +66,16 @@
 				<div class="brand-subtitle">월간 단어 성적 관리</div>
 			</header>
 
+			<!-- 🚨 직접 타이핑하던 input 칸을 지우고 select(드롭다운)로 바꿨습니다 -->
 			<div class="search-box">
-				<input type="text" id="searchName" placeholder="학생 이름 검색 (예: 김철수)">
-					<button onclick="searchReport()">기록 열람</button>
-				</div>
+				<select id="classSelector" onchange="loadStudents()">
+					<option value="">반 선택</option>
+				</select>
+				<select id="studentSelector">
+					<option value="">학생 선택</option>
+				</select>
+				<button onclick="searchReport()">기록 열람</button>
+			</div>
 
 			<div id="calendarArea" class="calendar-container">
 				<div class="month-title" id="monthTitle">이번 달 단어 성적</div>
@@ -89,7 +101,6 @@
 				</button>
 			</div>
 
-			<!-- 🚨 양쪽으로 이동할 수 있는 메뉴 버튼 두 개 배치 -->
 			<div class="nav-links">
 				<a href="manage.html">⚙️ 반/학생 관리</a>
 				<a href="index.html">← 점수 입력으로 돌아가기</a>
@@ -112,15 +123,60 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			const studentNameFromUrl = urlParams.get('studentName');
 
+			// 1. 화면이 켜지면 반 목록을 먼저 불러옵니다.
+			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
+			const classSelector = document.getElementById('classSelector');
+			snapshot.forEach((doc) => {
+			const data = doc.data();
+			classSelector.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
+			});
+
+			// 2. 만약 다른 화면에서 학생 이름 정보가 넘어왔다면?
 			if (studentNameFromUrl) {
-			document.getElementById('searchName').value = studentNameFromUrl;
-			searchReport();
+			// 그 학생이 어느 반인지 데이터베이스에서 찾은 다음, 자동으로 세팅해 줍니다!
+			db.collection("students").where("name", "==", studentNameFromUrl).get().then(studentSnap => {
+			if (!studentSnap.empty) {
+			const studentData = studentSnap.docs[0].data();
+			classSelector.value = studentData.classId; // 반 자동 선택
+			loadStudents(studentNameFromUrl, true); // 학생 자동 선택 & 바로 검색
 			}
+			});
+			}
+			});
 			};
 
+			// 반을 선택하면 학생 목록을 불러오는 함수
+			function loadStudents(autoSelectName = null, autoSearch = false) {
+			const classId = document.getElementById('classSelector').value;
+			const studentSelector = document.getElementById('studentSelector');
+
+			if (!classId) {
+			studentSelector.innerHTML = '<option value="">학생 선택</option>';
+			return;
+			}
+
+			studentSelector.innerHTML = '<option value="">불러오는 중...</option>';
+
+			db.collection("students").where("classId", "==", classId).get().then((snapshot) => {
+			studentSelector.innerHTML = '<option value="">학생 선택</option>';
+			snapshot.forEach((doc) => {
+			const data = doc.data();
+			studentSelector.innerHTML += `<option value="${data.name}">${data.name}</option>`;
+			});
+
+			// 자동 선택 기능이 발동되었을 때 처리
+			if (autoSelectName) {
+			studentSelector.value = autoSelectName;
+			if (autoSearch) {
+			searchReport(); // 선택 완료 후 자동으로 기록 열람까지 실행!
+			}
+			}
+			});
+			}
+
 			function searchReport() {
-			const searchName = document.getElementById('searchName').value.trim();
-			if (!searchName) { alert("학생 이름을 입력해 주세요."); return; }
+			const searchName = document.getElementById('studentSelector').value;
+			if (!searchName) { alert("먼저 확인하실 학생을 선택해 주세요."); return; }
 
 			const now = new Date();
 			const year = now.getFullYear();
@@ -172,8 +228,8 @@
 			}
 
 			function copyParentLink() {
-			const name = document.getElementById('searchName').value.trim();
-			if (!name) { alert("먼저 학생 이름을 검색해 주세요."); return; }
+			const name = document.getElementById('studentSelector').value;
+			if (!name) { alert("먼저 학생을 선택해 주세요."); return; }
 
 			const currentUrl = window.location.href.split('report.html')[0].split('?')[0];
 			const finalLink = `${currentUrl}parent.html?name=${encodeURIComponent(name)}`;
