@@ -8,8 +8,7 @@
 					body {
 					margin: 0; padding: 0;
 					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-					background-color: #F8F9FA; color: #333333;
-					display: flex; justify-content: center;
+					background-color: #F8F9FA; color: #333333; display: flex; justify-content: center;
 					}
 					.app-container {
 					width: 100%; max-width: 480px; min-height: 100vh;
@@ -37,7 +36,6 @@
 					}
 					.btn-submit:hover { background-color: #1A3256; }
 
-					/* 하단 이동 링크 스타일 */
 					.nav-links { display: flex; justify-content: space-between; padding: 0 10px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
 					.nav-links a:hover { color: #2B4C7E; }
@@ -56,7 +54,6 @@
 
 			<main>
 				<div class="card">
-					<!-- 새롭게 추가된 반/학생 선택 구역 -->
 					<div class="form-group">
 						<label>반 선택</label>
 						<select id="classSelector" onchange="loadStudents()">
@@ -78,7 +75,6 @@
 					<div class="score-row">
 						<div class="form-group">
 							<label>만점 기준</label>
-							<!-- 매번 쓰기 귀찮으시지 않게 기본값 100을 넣어두었습니다 -->
 							<input type="number" id="maxScore" value="100">
                     </div>
 						<div class="form-group">
@@ -90,7 +86,6 @@
 					<button class="btn-submit" onclick="saveScore()">오늘 점수 저장하기</button>
 				</div>
 
-				<!-- 하단에 다른 페이지로 쉽게 이동할 수 있는 버튼 추가 -->
 				<div class="nav-links">
 					<a href="manage.html">⚙️ 반/학생 관리</a>
 					<a href="report.html">📊 성적 결과 확인</a>
@@ -112,19 +107,29 @@
 
 			document.getElementById('testDate').valueAsDate = new Date();
 
-			// 1. 화면이 켜지면 반 목록을 자동으로 불러옵니다
 			window.onload = function() {
+			// 🚨 주소창에 숨겨서 보내온 정보(파라미터)를 읽어옵니다.
+			const urlParams = new URLSearchParams(window.location.search);
+			const preSelectClassId = urlParams.get('classId');
+			const preSelectStudentName = urlParams.get('studentName');
+
 			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
 			const classSelector = document.getElementById('classSelector');
 			snapshot.forEach((doc) => {
 			const data = doc.data();
 			classSelector.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
 			});
+
+			// 만약 주소창에 반 정보가 있다면, 그 반을 바로 선택하고 학생 목록을 부릅니다!
+			if (preSelectClassId) {
+			classSelector.value = preSelectClassId;
+			loadStudents(preSelectStudentName); // 넘겨받은 학생 이름도 같이 전달
+			}
 			});
 			};
 
-			// 2. 반을 선택하면 해당 반의 학생 목록을 불러옵니다
-			function loadStudents() {
+			// 🚨 autoSelectName 이라는 숨겨진 변수를 추가했습니다.
+			function loadStudents(autoSelectName = null) {
 			const classId = document.getElementById('classSelector').value;
 			const studentSelector = document.getElementById('studentSelector');
 
@@ -139,13 +144,16 @@
 			studentSelector.innerHTML = '<option value="">학생을 선택해주세요</option>';
 			snapshot.forEach((doc) => {
 			const data = doc.data();
-			// 이름으로 성적을 검색하므로 value에 학생 이름을 넣습니다
 			studentSelector.innerHTML += `<option value="${data.name}">${data.name}</option>`;
 			});
+
+			// 학생 목록을 다 불러온 뒤, 아까 넘겨받은 학생 이름이 있다면 바로 선택(고정)해 줍니다!
+			if (typeof autoSelectName === 'string' && autoSelectName) {
+			studentSelector.value = autoSelectName;
+			}
 			});
 			}
 
-			// 3. 점수 저장 기능 (+ 결과창 이동 로직 추가)
 			function saveScore() {
 			const name = document.getElementById('studentSelector').value;
 			const date = document.getElementById('testDate').value;
@@ -156,7 +164,6 @@
 			alert("학생, 날짜, 만점 기준, 획득 점수를 모두 입력해 주세요!");
 			return;
 			}
-
 			if (Number(score) > Number(maxScore)) {
 			alert("획득 점수가 만점보다 클 수 없습니다. 다시 확인해 주세요!");
 			return;
@@ -170,11 +177,10 @@
 			timestamp: firebase.firestore.FieldValue.serverTimestamp()
 			})
 			.then(function() {
-			// 저장 성공 후 화면 이동 여부를 묻는 창을 띄웁니다
-			if(confirm(name + " 학생의 점수가 저장되었습니다! 🎉\n\n성적 결과 화면으로 이동하시겠습니까?\n(취소를 누르면 다음 학생 점수를 계속 입력할 수 있습니다.)")) {
-			window.location.href = "report.html"; // 확인 누르면 이동
+			if(confirm(name + " 학생의 점수가 저장되었습니다! 🎉\n\n성적 결과 화면으로 이동하시겠습니까?")) {
+			window.location.href = "report.html";
 			} else {
-			document.getElementById('studentSelector').value = ''; // 취소 누르면 이름/점수 칸만 초기화
+			document.getElementById('studentSelector').value = '';
 			document.getElementById('score').value = '';
 			}
 			})
