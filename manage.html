@@ -111,6 +111,10 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
+			if (sessionStorage.getItem("bornAuth") !== "true") {
+			alert("선생님 전용 페이지입니다. 먼저 로그인을 해주세요!");
+			window.location.href = "login.html";
+
 			window.onload = function() { loadClasses(); };
 
 			function addClass() {
