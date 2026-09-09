@@ -21,7 +21,6 @@
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
 					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
 
-					/* 🚨 검색 박스를 드롭다운 2개와 버튼이 잘 어울리게 수정했습니다 */
 					.search-box { display: flex; gap: 6px; margin-bottom: 20px; }
 					.search-box select {
 					flex: 1; padding: 10px; font-size: 13px;
@@ -33,15 +32,36 @@
 					}
 
 					.calendar-container { display: none; margin-top: 20px; }
-					.month-title { text-align: center; font-size: 16px; font-weight: bold; color: #374151; margin-bottom: 10px; }
-					.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-					.day-header { font-size: 11px; color: #6B7280; font-weight: 600; padding-bottom: 5px; }
+
+					.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px; }
+					.week-btn { border: none; background: none; font-size: 20px; color: #1E3A8A; cursor: pointer; font-weight: bold; }
+					.week-btn:hover { color: #3B82F6; }
+					.month-title { text-align: center; font-size: 16px; font-weight: bold; color: #374151; margin: 0; }
+
+					/* 🚨 월~금 5일 체제로 변경 (repeat 5) */
+					.calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; }
+					.day-header { font-size: 12px; color: #4B5563; font-weight: 700; padding-bottom: 5px; }
 					.day-cell { border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px 2px; min-height: 50px; font-size: 12px; background: #FFF; color: #9CA3AF;}
 
 					.day-cell.has-score { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; font-weight: 600; }
-					.score-label { display: block; font-size: 11px; color: #E11D48; margin-top: 4px; font-weight: bold; letter-spacing: -0.5px; }
+					.score-label { display: block; font-size: 12px; color: #E11D48; margin-top: 4px; font-weight: bold; letter-spacing: -0.5px; }
 
 					.summary-box { background: #F8FAFC; border-radius: 8px; padding: 15px; text-align: center; margin-top: 20px; font-size: 15px; font-weight: 600; color: #0F172A;}
+
+					/* 🚨 선생님 평가 코멘트 박스 스타일 */
+					.eval-box { margin-top: 15px; background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; }
+					.eval-box h3 { font-size: 14px; margin: 0 0 10px 0; color: #1E3A8A; }
+					.eval-box textarea {
+					width: 100%; padding: 10px; font-size: 13px; border: 1px solid #CBD5E1;
+					border-radius: 6px; box-sizing: border-box; resize: none; outline: none;
+					font-family: inherit;
+					}
+					.eval-box textarea:focus { border-color: #3B82F6; }
+					.btn-eval-save {
+					width: 100%; padding: 10px; margin-top: 8px; font-size: 13px; font-weight: 600;
+					color: #FFF; background-color: #3B82F6; border: none; border-radius: 6px; cursor: pointer;
+					}
+					.btn-eval-save:hover { background-color: #2563EB; }
 
 					.btn-share {
 					width: 100%; padding: 14px; margin-top: 15px; font-size: 14px; font-weight: 600;
@@ -63,10 +83,9 @@
 		<div class="app-container">
 			<header>
 				<h1 class="brand-title">BORN 영어학원</h1>
-				<div class="brand-subtitle">월간 단어 성적 관리</div>
+				<div class="brand-subtitle">주간 단어 성적 관리</div>
 			</header>
 
-			<!-- 🚨 직접 타이핑하던 input 칸을 지우고 select(드롭다운)로 바꿨습니다 -->
 			<div class="search-box">
 				<select id="classSelector" onchange="loadStudents()">
 					<option value="">반 선택</option>
@@ -74,26 +93,37 @@
 				<select id="studentSelector">
 					<option value="">학생 선택</option>
 				</select>
-				<button onclick="searchReport()">기록 열람</button>
+				<button onclick="currentViewDate = new Date(); searchReport();">기록 열람</button>
 			</div>
 
 			<div id="calendarArea" class="calendar-container">
-				<div class="month-title" id="monthTitle">이번 달 단어 성적</div>
 
+				<div class="week-nav">
+					<button class="week-btn" onclick="changeWeek(-1)">◀</button>
+					<div class="month-title" id="weekTitle">이번 주 단어 성적</div>
+					<button class="week-btn" onclick="changeWeek(1)">▶</button>
+				</div>
+
+				<!-- 🚨 일요일, 토요일을 뺐습니다 -->
 				<div class="calendar-grid">
-					<div class="day-header" style="color:#EF4444;">일</div>
 					<div class="day-header">월</div>
 					<div class="day-header">화</div>
 					<div class="day-header">수</div>
 					<div class="day-header">목</div>
 					<div class="day-header">금</div>
-					<div class="day-header" style="color:#3B82F6;">토</div>
 				</div>
 
 				<div class="calendar-grid" id="calendarDays"></div>
 
 				<div class="summary-box" id="averageScore">
 					누적 평균: 데이터를 불러오는 중...
+				</div>
+
+				<!-- 🚨 선생님 평가 코멘트 입력 구역 -->
+				<div class="eval-box">
+					<h3>📝 이번 주 학습 평가 (학부모님 확인용)</h3>
+					<textarea id="weekComment" rows="3" placeholder="이번 주 학생의 단어 학습 태도나 결과를 간단히 남겨주세요."></textarea>
+					<button class="btn-eval-save" onclick="saveEvaluation()">코멘트 저장하기</button>
 				</div>
 
 				<button class="btn-share" onclick="copyParentLink()">
@@ -119,11 +149,13 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
+			let currentViewDate = new Date();
+			let currentMondayString = ""; // 코멘트 저장을 위해 '이번 주 월요일' 날짜를 기억해두는 변수입니다.
+
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
 			const studentNameFromUrl = urlParams.get('studentName');
 
-			// 1. 화면이 켜지면 반 목록을 먼저 불러옵니다.
 			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
 			const classSelector = document.getElementById('classSelector');
 			snapshot.forEach((doc) => {
@@ -131,21 +163,18 @@
 			classSelector.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
 			});
 
-			// 2. 만약 다른 화면에서 학생 이름 정보가 넘어왔다면?
 			if (studentNameFromUrl) {
-			// 그 학생이 어느 반인지 데이터베이스에서 찾은 다음, 자동으로 세팅해 줍니다!
 			db.collection("students").where("name", "==", studentNameFromUrl).get().then(studentSnap => {
 			if (!studentSnap.empty) {
 			const studentData = studentSnap.docs[0].data();
-			classSelector.value = studentData.classId; // 반 자동 선택
-			loadStudents(studentNameFromUrl, true); // 학생 자동 선택 & 바로 검색
+			classSelector.value = studentData.classId;
+			loadStudents(studentNameFromUrl, true);
 			}
 			});
 			}
 			});
 			};
 
-			// 반을 선택하면 학생 목록을 불러오는 함수
 			function loadStudents(autoSelectName = null, autoSearch = false) {
 			const classId = document.getElementById('classSelector').value;
 			const studentSelector = document.getElementById('studentSelector');
@@ -154,7 +183,6 @@
 			studentSelector.innerHTML = '<option value="">학생 선택</option>';
 			return;
 			}
-
 			studentSelector.innerHTML = '<option value="">불러오는 중...</option>';
 
 			db.collection("students").where("classId", "==", classId).get().then((snapshot) => {
@@ -164,41 +192,59 @@
 			studentSelector.innerHTML += `<option value="${data.name}">${data.name}</option>`;
 			});
 
-			// 자동 선택 기능이 발동되었을 때 처리
 			if (autoSelectName) {
 			studentSelector.value = autoSelectName;
 			if (autoSearch) {
-			searchReport(); // 선택 완료 후 자동으로 기록 열람까지 실행!
+			currentViewDate = new Date();
+			searchReport();
 			}
 			}
 			});
+			}
+
+			function changeWeek(offset) {
+			currentViewDate.setDate(currentViewDate.getDate() + (offset * 7));
+			searchReport();
 			}
 
 			function searchReport() {
 			const searchName = document.getElementById('studentSelector').value;
 			if (!searchName) { alert("먼저 확인하실 학생을 선택해 주세요."); return; }
 
-			const now = new Date();
-			const year = now.getFullYear();
-			const month = now.getMonth();
+			// 🚨 일요일이 아닌 '월요일'을 기준으로 일주일을 계산하도록 수정했습니다.
+			const d = new Date(currentViewDate);
+			const day = d.getDay();
+			const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 월요일 날짜 구하기
 
-			document.getElementById('monthTitle').innerText = `${year}년 ${month + 1}월 단어 성적표`;
+			const monday = new Date(d.setDate(diff));
+			const friday = new Date(monday);
+			friday.setDate(monday.getDate() + 4);
 
-			const firstDay = new Date(year, month, 1).getDay();
-			const daysInMonth = new Date(year, month + 1, 0).getDate();
+			// 데이터베이스 저장을 위한 고유 문자열 (예: 2026-09-07)
+			currentMondayString = `${monday.getFullYear()}-${String(monday.getMonth()+1).padStart(2,'0')}-${String(monday.getDate()).padStart(2,'0')}`;
+
+			document.getElementById('weekTitle').innerText =
+			`${monday.getMonth() + 1}월 ${monday.getDate()}일 ~ ${friday.getMonth() + 1}월 ${friday.getDate()}일`;
 
 			const calendarDays = document.getElementById('calendarDays');
 			calendarDays.innerHTML = '';
 
-			for (let i = 0; i < firstDay; i++) {
-                calendarDays.innerHTML += `<div class="day-cell"></div>`;
+			const weekDates = [];
+			// 월요일부터 금요일까지 5칸만 그립니다.
+			for (let i = 0; i < 5; i++) {
+                const curr = new Date(monday);
+                curr.setDate(monday.getDate() + i);
+                
+                const yyyy = curr.getFullYear();
+                const mm = String(curr.getMonth() + 1).padStart(2, '0');
+                const dd = String(curr.getDate()).padStart(2, '0');
+                const dateString = `${yyyy}-${mm}-${dd}`;
+                
+                weekDates.push(dateString); 
+                calendarDays.innerHTML += `<div class="day-cell" id="date-${dateString}">${curr.getDate()}</div>`;
 			}
 
-			for (let day = 1; day <= daysInMonth; day++) {
-			const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-			calendarDays.innerHTML += `<div class="day-cell" id="date-${dateString}">${day}</div>`;
-			}
-
+			// 1. 점수 데이터 불러오기
 			db.collection("scores").where("name", "==", searchName).get()
 			.then((querySnapshot) => {
 			let totalScore = 0;
@@ -206,6 +252,7 @@
 
 			querySnapshot.forEach((doc) => {
 			const data = doc.data();
+			if (weekDates.includes(data.date)) {
 			const dayCell = document.getElementById(`date-${data.date}`);
 			if (dayCell) {
 			dayCell.classList.add('has-score');
@@ -213,17 +260,63 @@
 			totalScore += data.score;
 			totalMaxScore += data.maxScore;
 			}
+			}
 			});
 
 			const avgBox = document.getElementById('averageScore');
 			if (totalMaxScore > 0) {
 			const avgScore = Math.round((totalScore / totalMaxScore) * 100);
-			avgBox.innerText = `🏆 이번 달 평균 환산 점수: ${avgScore}점`;
+			avgBox.innerText = `🏆 이번 주 평균 환산 점수: ${avgScore}점`;
 			} else {
-			avgBox.innerText = `이번 달 입력된 성적이 없습니다.`;
+			avgBox.innerText = `이번 주 입력된 성적이 없습니다.`;
 			}
 
 			document.getElementById('calendarArea').style.display = 'block';
+			});
+
+			// 2. 선생님 코멘트 데이터 불러오기
+			document.getElementById('weekComment').value = "코멘트를 불러오는 중...";
+			db.collection("evaluations")
+			.where("name", "==", searchName)
+			.where("week", "==", currentMondayString)
+			.get()
+			.then(snap => {
+			if(!snap.empty) {
+			document.getElementById('weekComment').value = snap.docs[0].data().comment;
+			} else {
+			document.getElementById('weekComment').value = ""; // 저장된 코멘트가 없으면 빈칸
+			}
+			});
+			}
+
+			// 🚨 작성한 코멘트를 데이터베이스에 저장(또는 덮어쓰기)하는 기능입니다.
+			function saveEvaluation() {
+			const searchName = document.getElementById('studentSelector').value;
+			const comment = document.getElementById('weekComment').value.trim();
+
+			if (!searchName) return alert("학생을 먼저 선택해주세요.");
+			if (!currentMondayString) return;
+
+			db.collection("evaluations")
+			.where("name", "==", searchName)
+			.where("week", "==", currentMondayString)
+			.get()
+			.then(snap => {
+			if(!snap.empty) {
+			// 이미 쓴 코멘트가 있다면 덮어쓰기(수정)
+			db.collection("evaluations").doc(snap.docs[0].id).update({
+			comment: comment,
+			timestamp: firebase.firestore.FieldValue.serverTimestamp()
+			}).then(() => alert("평가가 성공적으로 수정되었습니다!"));
+			} else {
+			// 새로 쓰는 거라면 새로 저장
+			db.collection("evaluations").add({
+			name: searchName,
+			week: currentMondayString,
+			comment: comment,
+			timestamp: firebase.firestore.FieldValue.serverTimestamp()
+			}).then(() => alert("평가가 성공적으로 저장되었습니다!"));
+			}
 			});
 			}
 
