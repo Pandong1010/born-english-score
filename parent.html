@@ -3,90 +3,47 @@
 	<head>
 		<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>BORN 영어학원 성적표</title>
+				<title>BORN 영어학원 주간 성적표</title>
 				<style>
 					body {
 					margin: 0; padding: 0;
-					font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-					background-color: #F7F9FC;
+					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+					background-color: #F4F7F6;
 					color: #333; display: flex; justify-content: center;
 					}
-
 					.app-container {
 					width: 100%; max-width: 480px; min-height: 100vh;
-					background-color: #FFFFFF;
-					box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-					position: relative; overflow: hidden;
+					background-color: #FFF; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+					padding: 30px 20px; box-sizing: border-box;
+					}
+					header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
+
+					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
+					.student-title { font-size: 16px; font-weight: 800; color: #E11D48; margin-top: 8px; }
+
+					.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px; }
+					.week-btn { border: none; background: none; font-size: 20px; color: #1E3A8A; cursor: pointer; font-weight: bold; padding: 5px 10px;}
+					.week-btn:hover { color: #3B82F6; }
+					.month-title { text-align: center; font-size: 16px; font-weight: bold; color: #374151; margin: 0; }
+
+					.calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; }
+					.day-header { font-size: 12px; color: #4B5563; font-weight: 700; padding-bottom: 5px; }
+					.day-cell { border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px 2px; min-height: 55px; font-size: 12px; background: #FFF; color: #9CA3AF; display: flex; flex-direction: column; justify-content: center;}
+
+					.day-cell.has-score { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; font-weight: 600; }
+					.score-label { display: block; font-size: 13px; color: #E11D48; margin-top: 4px; font-weight: bold; letter-spacing: -0.5px; }
+
+					.summary-box { background: #F8FAFC; border-radius: 8px; padding: 15px; text-align: center; margin-top: 20px; font-size: 15px; font-weight: 600; color: #0F172A;}
+
+					.eval-box { margin-top: 20px; background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; }
+					.eval-box h3 { font-size: 14px; margin: 0 0 12px 0; color: #1E3A8A; }
+					.comment-display {
+					width: 100%; padding: 15px; font-size: 14px; background-color: #F8FAFC;
+					border-radius: 6px; box-sizing: border-box; line-height: 1.6; color: #334155;
+					min-height: 70px; white-space: pre-wrap; /* 줄바꿈까지 그대로 예쁘게 보여줍니다 */
 					}
 
-					header {
-					background: #FFFFFF;
-					padding: 35px 20px 20px;
-					text-align: center;
-					}
-
-					.brand-logo {
-					width: 160px;
-					height: auto;
-					margin-bottom: 5px;
-					}
-					.brand-subtitle { font-size: 13px; color: #64748B; font-weight: 600; letter-spacing: 0.5px;}
-
-					.content-area {
-					padding: 0 20px 30px;
-					position: relative;
-					z-index: 10;
-					}
-
-					.student-info {
-					background-color: #F8FAFC;
-					border-radius: 16px;
-					padding: 20px; text-align: center; margin-bottom: 24px;
-					box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-					border: 1px solid #E2E8F0;
-					}
-					.student-name { font-size: 17px; font-weight: 700; color: #1E293B; }
-					.student-name span { color: #3B82F6; }
-
-					.month-title {
-					text-align: center; font-size: 16px; font-weight: 800;
-					color: #334155; margin-bottom: 16px;
-					display: flex; justify-content: center; align-items: center; gap: 8px;
-					}
-					.calendar-box {
-					background: #FFFFFF; border-radius: 16px; padding: 20px 15px;
-					box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-					border: 1px solid #F1F5F9;
-					}
-					.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-					.day-header { font-size: 12px; color: #94A3B8; font-weight: 700; padding-bottom: 10px; }
-					.day-cell {
-					border-radius: 10px; padding: 8px 0; min-height: 55px;
-					font-size: 13px; background: #F8FAFC; color: #CBD5E1;
-					display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
-					}
-
-					.day-cell.has-score { background: #EFF6FF; color: #1E3A8A; font-weight: 700; box-shadow: inset 0 0 0 1px #DBEAFE;}
-
-					/* 12/20 처럼 길어지는 글자가 잘리지 않도록 폰트 크기 및 간격 미세 조정 */
-					.score-label { display: block; font-size: 11px; color: #2563EB; margin-top: 6px; font-weight: 800; letter-spacing: -0.5px; }
-
-					.day-cell.perfect-score { background: #FEF3C7; color: #B45309; font-weight: 800; box-shadow: inset 0 0 0 1px #FDE68A;}
-					.perfect-score .score-label { color: #D97706; }
-
-					.summary-box {
-					background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
-					border-radius: 16px; padding: 24px;
-					text-align: center; margin-top: 24px;
-					color: #FFFFFF;
-					box-shadow: 0 8px 20px rgba(30, 41, 59, 0.15);
-					}
-					.summary-title { font-size: 13px; color: #94A3B8; margin-bottom: 8px; font-weight: 600;}
-					.summary-score { font-size: 28px; font-weight: 800; color: #F8FAFC; letter-spacing: -0.5px;}
-					.summary-score span { font-size: 14px; font-weight: 500; color: #CBD5E1;} /* '점' 글자 크기 조정 */
-
-					.fade-in { animation: fadeIn 0.8s ease-out forwards; }
-					@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+					.error-msg { text-align: center; font-size: 15px; font-weight: bold; color: #EF4444; margin-top: 50px; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -94,40 +51,41 @@
 			</head>
 	<body>
 
-		<div class="app-container">
+		<div class="app-container" id="mainContainer" style="display: none;">
 			<header>
-				<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="brand-logo">
-					<div class="brand-subtitle">Monthly Vocabulary Report</div>
-				</header>
+				<h1 class="brand-title">BORN 영어학원</h1>
+				<div class="student-title" id="headerStudentName">학생 주간 성적표</div>
+			</header>
 
-			<div class="content-area" id="contentArea">
-				<div class="student-info fade-in">
-					<div class="student-name" id="studentNameDisplay">데이터를 불러오는 중입니다...</div>
-				</div>
-
-				<div class="calendar-box fade-in" style="animation-delay: 0.1s;">
-					<div class="month-title" id="monthTitle"></div>
-
-					<div class="calendar-grid">
-						<div class="day-header" style="color:#EF4444;">일</div>
-						<div class="day-header">월</div>
-						<div class="day-header">화</div>
-						<div class="day-header">수</div>
-						<div class="day-header">목</div>
-						<div class="day-header">금</div>
-						<div class="day-header" style="color:#3B82F6;">토</div>
-					</div>
-
-					<div class="calendar-grid" id="calendarDays"></div>
-				</div>
-
-				<div class="summary-box fade-in" id="averageScoreBox" style="animation-delay: 0.2s;">
-					<div class="summary-title">이번 달 평균 환산 점수 (100점 만점 기준)</div>
-					<div class="summary-score" id="averageScore">
-						--<span> 점</span>
-					</div>
-				</div>
+			<div class="week-nav">
+				<button class="week-btn" onclick="changeWeek(-1)">◀</button>
+				<div class="month-title" id="weekTitle">이번 주 성적</div>
+				<button class="week-btn" onclick="changeWeek(1)">▶</button>
 			</div>
+
+			<div class="calendar-grid">
+				<div class="day-header">월</div>
+				<div class="day-header">화</div>
+				<div class="day-header">수</div>
+				<div class="day-header">목</div>
+				<div class="day-header">금</div>
+			</div>
+
+			<div class="calendar-grid" id="calendarDays"></div>
+
+			<div class="summary-box" id="averageScore">
+				데이터를 불러오는 중...
+			</div>
+
+			<div class="eval-box">
+				<h3>📝 선생님의 주간 코멘트</h3>
+				<!-- 🚨 학부모님용이라 수정 불가(읽기 전용) 박스로 만들었습니다 -->
+				<div id="weekComment" class="comment-display">코멘트를 불러오는 중...</div>
+			</div>
+		</div>
+
+		<div id="errorContainer" class="error-msg" style="display: none;">
+			잘못된 접근입니다. 올바른 링크로 다시 접속해 주세요.
 		</div>
 
 		<script>
@@ -142,69 +100,103 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
+			let currentViewDate = new Date();
+			let currentMondayString = "";
+			let studentName = "";
+
+			window.onload = function() {
+			// 카톡 주소창에서 학생 이름을 몰래 빼옵니다
 			const urlParams = new URLSearchParams(window.location.search);
-			const studentName = urlParams.get('name');
+			studentName = urlParams.get('name');
 
-			document.getElementById('studentNameDisplay').innerHTML = `<span>${studentName}</span> 학생의 단어 성적표`;
-			loadStudentData(studentName);
+			if (!studentName) {
+			document.getElementById('errorContainer').style.display = "block";
+			} else {
+			document.getElementById('headerStudentName').innerText = `🏆 ${studentName} 학생 주간 성적표`;
+			document.getElementById('mainContainer').style.display = "block";
+			loadReport();
+			}
+			};
 
-			function loadStudentData(name) {
-			const now = new Date();
-			const year = now.getFullYear();
-			const month = now.getMonth();
+			function changeWeek(offset) {
+			currentViewDate.setDate(currentViewDate.getDate() + (offset * 7));
+			loadReport();
+			}
 
-			document.getElementById('monthTitle').innerHTML = `📅 ${year}년 ${month + 1}월`;
+			function loadReport() {
+			// 월요일 날짜 찾기
+			const d = new Date(currentViewDate);
+			const day = d.getDay();
+			const diff = d.getDate() - day + (day === 0 ? -6 : 1);
 
-			const firstDay = new Date(year, month, 1).getDay();
-			const daysInMonth = new Date(year, month + 1, 0).getDate();
+			const monday = new Date(d.setDate(diff));
+			const friday = new Date(monday);
+			friday.setDate(monday.getDate() + 4);
+
+			currentMondayString = `${monday.getFullYear()}-${String(monday.getMonth()+1).padStart(2,'0')}-${String(monday.getDate()).padStart(2,'0')}`;
+
+			document.getElementById('weekTitle').innerText =
+			`${monday.getMonth() + 1}월 ${monday.getDate()}일 ~ ${friday.getMonth() + 1}월 ${friday.getDate()}일`;
 
 			const calendarDays = document.getElementById('calendarDays');
+			calendarDays.innerHTML = '';
 
-			for (let i = 0; i < firstDay; i++) {
-        calendarDays.innerHTML += `<div class="day-cell"></div>`;
+			const weekDates = [];
+			for (let i = 0; i < 5; i++) {
+                const curr = new Date(monday);
+                curr.setDate(monday.getDate() + i);
+                
+                const yyyy = curr.getFullYear();
+                const mm = String(curr.getMonth() + 1).padStart(2, '0');
+                const dd = String(curr.getDate()).padStart(2, '0');
+                const dateString = `${yyyy}-${mm}-${dd}`;
+                
+                weekDates.push(dateString); 
+                calendarDays.innerHTML += `<div class="day-cell" id="date-${dateString}">${curr.getDate()}</div>`;
 			}
 
-			for (let day = 1; day <= daysInMonth; day++) {
-			const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-			calendarDays.innerHTML += `<div class="day-cell" id="date-${dateString}">${day}</div>`;
-			}
-
-			db.collection("scores").where("name", "==", name).get()
+			// 1. 점수 불러오기
+			db.collection("scores").where("name", "==", studentName).get()
 			.then((querySnapshot) => {
 			let totalScore = 0;
-			let totalMaxScore = 0; // 추가된 부분: 총 만점 기준 합산
+			let totalMaxScore = 0;
 
 			querySnapshot.forEach((doc) => {
 			const data = doc.data();
+			if (weekDates.includes(data.date)) {
 			const dayCell = document.getElementById(`date-${data.date}`);
-
 			if (dayCell) {
-			totalScore += data.score;
-			totalMaxScore += data.maxScore; // 이번 달 총 만점 누적
-
-			// 점수 표시 방식 변경: score/maxScore
-			if (data.score === data.maxScore) {
-			dayCell.classList.add('perfect-score');
-			dayCell.innerHTML += `<span class="score-label">💯 ${data.score}/${data.maxScore}</span>`;
-			} else {
 			dayCell.classList.add('has-score');
 			dayCell.innerHTML += `<span class="score-label">${data.score}/${data.maxScore}</span>`;
+			totalScore += data.score;
+			totalMaxScore += data.maxScore;
 			}
 			}
 			});
 
-			const avgScoreElement = document.getElementById('averageScore');
+			const avgBox = document.getElementById('averageScore');
 			if (totalMaxScore > 0) {
-			// 환산 공식: (총 획득 점수 / 총 만점 기준) * 100
 			const avgScore = Math.round((totalScore / totalMaxScore) * 100);
-			avgScoreElement.innerHTML = `${avgScore}<span> 점</span>`;
+			avgBox.innerText = `이번 주 평균 환산 점수: ${avgScore}점`;
 			} else {
-			document.getElementById('averageScoreBox').style.background = "linear-gradient(135deg, #94A3B8 0%, #CBD5E1 100%)";
-			avgScoreElement.innerHTML = `<span style="font-size:14px; color:#FFF;">아직 기록된 성적이 없습니다.</span>`;
+			avgBox.innerText = `이번 주 입력된 성적이 없습니다.`;
+			}
+			});
+
+			// 2. 선생님 코멘트 불러오기
+			document.getElementById('weekComment').innerText = "코멘트를 불러오는 중...";
+			db.collection("evaluations")
+			.where("name", "==", studentName)
+			.where("week", "==", currentMondayString)
+			.get()
+			.then(snap => {
+			if(!snap.empty) {
+			document.getElementById('weekComment').innerText = snap.docs[0].data().comment;
+			} else {
+			document.getElementById('weekComment').innerText = "이번 주 코멘트가 아직 작성되지 않았습니다.";
 			}
 			});
 			}
 		</script>
-
 	</body>
 </html>
