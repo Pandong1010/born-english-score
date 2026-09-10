@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿수석 개발자님, UI/UX(사용자 경험)를 보는 눈이 정말 예리하십니다!
+
+맞습니다. 방금 전까지 썼던 기능은 인터넷 브라우저가 기본으로 제공하는 prompt()라는 기능인데, 이게 만들기엔 제일 간단하지만 디자인을 바꿀 수가 없어서 90년대 홈페이지처럼 굉장히 허접하게(투박하게) 생겼다는 치명적인 단점이 있죠. 😅
+
+원장님(사모님)과 선생님들이 보시기에 훨씬 고급스럽고 '진짜 앱'처럼 느껴지도록, 촌스러운 브라우저 팝업을 완전히 없애버렸습니다. 대신 화면 안에서 부드럽게 나타나는 세련된 맞춤형 입력창(커스텀 모달)을 달력에 딱 붙여두었습니다.
+
+이제 달력을 누르면 화면 자체가 살짝 어두워지면서, 기존 디자인과 완벽하게 어울리는 깔끔한 점수 입력/수정 창이 뜹니다.
+
+아래 완성된 report.html 코드로 시원하게 덮어씌워 주세요!
+
+HTML
+<!DOCTYPE html>
 <html lang="ko">
 	<head>
 		<meta charset="UTF-8">
@@ -15,12 +26,11 @@
 					width: 100%; max-width: 480px; min-height: 100vh;
 					background-color: #FFF; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 					padding: 30px 20px; box-sizing: border-box;
+					position: relative; /* 모달창 위치 기준점 */
 					}
 					header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
-					/* 🚨 시바 로고 크기를 80px에서 160px로 두 배 키웠습니다! */
 					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
-
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
 					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
 
@@ -44,7 +54,6 @@
 					.calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; }
 					.day-header { font-size: 12px; color: #4B5563; font-weight: 700; padding-bottom: 5px; }
 
-					/* 🚨 누를 수 있다는 걸 보여주기 위해 마우스를 올리면 색이 변하게 만들었습니다 */
 					.day-cell {
 					border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px 2px; min-height: 50px;
 					font-size: 12px; background: #FFF; color: #9CA3AF; cursor: pointer; transition: 0.2s;
@@ -84,6 +93,29 @@
 					.nav-links { display: flex; justify-content: space-between; margin-top: 25px; padding: 0 10px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
 					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
+
+					/* 🚨 새롭게 추가된 깔끔한 앱 전용 모달(입력창) 디자인 */
+					.modal-overlay {
+					display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+					background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+					}
+					.modal-box {
+					background: #FFF; width: 90%; max-width: 320px; border-radius: 16px;
+					padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+					}
+					.modal-title { font-size: 16px; font-weight: 700; color: #1E3A8A; margin: 0 0 15px 0; text-align: center; }
+					.modal-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+					.modal-input-group div { flex: 1; }
+					.modal-input-group label { display: block; font-size: 12px; font-weight: 600; color: #4B5563; margin-bottom: 6px; }
+					.modal-input-group input {
+					width: 100%; padding: 10px; font-size: 14px; border: 1px solid #D1D5DB;
+					border-radius: 8px; box-sizing: border-box; outline: none; text-align: center;
+					}
+					.modal-input-group input:focus { border-color: #3B82F6; }
+					.modal-actions { display: flex; gap: 8px; }
+					.btn-modal-cancel { flex: 1; padding: 12px; background: #F3F4F6; color: #4B5563; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+					.btn-modal-save { flex: 1; padding: 12px; background: #3B82F6; color: #FFF; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+					.btn-modal-delete { width: 100%; padding: 10px; background: #FFF; color: #EF4444; border: 1px solid #FCA5A5; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -146,6 +178,28 @@
 			</div>
 		</div>
 
+		<!-- 🚨 브라우저 팝업 대신 사용할 세련된 화면 내 자체 팝업창(모달) -->
+		<div id="scoreModal" class="modal-overlay">
+			<div class="modal-box">
+				<h3 id="modalTitle" class="modal-title">점수 입력</h3>
+				<div class="modal-input-group">
+					<div>
+						<label>만점 기준</label>
+						<input type="number" id="modalMaxScore">
+                </div>
+					<div>
+						<label>획득 점수</label>
+						<input type="number" id="modalScore" placeholder="예: 95">
+                </div>
+				</div>
+				<div class="modal-actions">
+					<button class="btn-modal-cancel" onclick="closeModal()">취소</button>
+					<button class="btn-modal-save" onclick="saveModalScore()">저장하기</button>
+				</div>
+				<button class="btn-modal-delete" id="modalDeleteBtn" onclick="deleteModalScore()">🗑️ 이 날짜 성적 삭제</button>
+			</div>
+		</div>
+
 		<script>
 			const firebaseConfig = {
 			apiKey: "AIzaSyCti-4AKWT9kbq_a-HEy0AI-CwfxiZ5Msw",
@@ -160,6 +214,11 @@
 
 			let currentViewDate = new Date();
 			let currentMondayString = "";
+
+			// 🚨 모달(입력창) 처리를 위한 변수들
+			let editDocId = null;
+			let editDate = null;
+			let editName = null;
 
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
@@ -249,7 +308,6 @@
                 let totalMaxScore = 0;
                 let scoresData = {};
 
-                // 가져온 점수들을 날짜별로 정리합니다
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (weekDates.includes(data.date)) {
@@ -260,7 +318,6 @@
                 const calendarDays = document.getElementById('calendarDays');
                 calendarDays.innerHTML = '';
 
-                // 🚨 여기서 5개의 칸을 만들 때 '클릭 기능'을 달아줍니다!
                 for (let i = 0; i < 5; i++) {
                     const dateString = weekDates[i];
                     const dObj = new Date(dateString);
@@ -271,17 +328,16 @@
                         totalScore += data.score;
                         totalMaxScore += data.maxScore;
                         
-                        // 이미 점수가 있는 날짜를 클릭하면 '수정/삭제' 모드로 들어갑니다.
+                        // 기존 투박한 함수 대신 세련된 모달창 열기 함수를 연결했습니다.
                         calendarDays.innerHTML += `
-                            <div class="day-cell has-score" onclick="editDailyScore('${dateString}', '${searchName}', '${data.id}', ${data.score}, ${data.maxScore})">
+                            <div class="day-cell has-score" onclick="openModal('${dateString}', '${searchName}', '${data.id}', ${data.score}, ${data.maxScore})">
 				${dayNum}
 				<span class="score-label">${data.score}/${data.maxScore}</span>
 			</div>
 			`;
 			} else {
-			// 점수가 비어있는 날짜를 클릭하면 '새 점수 입력' 모드로 들어갑니다.
 			calendarDays.innerHTML += `
-			<div class="day-cell" onclick="addDailyScore('${dateString}', '${searchName}')">
+			<div class="day-cell" onclick="openModal('${dateString}', '${searchName}', null, '', '')">
 				${dayNum}
 				<span class="empty-label">+ 입력</span>
 			</div>
@@ -314,59 +370,85 @@
 			});
 			}
 
-			// 🚨 달력 빈칸을 눌렀을 때 새 점수 넣는 기능
-			function addDailyScore(date, name) {
-			const score = prompt(`[${date}]\n${name} 학생의 획득 점수를 입력하세요:`);
-			if (score === null || score.trim() === "") return; // 취소 누르면 중단
+			// 🚨 세련된 모달창 기능들 시작!
+			function openModal(date, name, docId, score, maxScore) {
+			editDocId = docId;
+			editDate = date;
+			editName = name;
 
-			const maxScore = prompt(`만점 기준을 입력하세요:`, "100"); // 기본값 100
-			if (maxScore === null || maxScore.trim() === "") return;
+			const modalTitle = document.getElementById('modalTitle');
+			const deleteBtn = document.getElementById('modalDeleteBtn');
+			const scoreInput = document.getElementById('modalScore');
+			const maxScoreInput = document.getElementById('modalMaxScore');
+
+			// 점수가 있으면 수정 모드, 없으면 새로 입력 모드로 창 모양을 바꿔줍니다.
+			if (docId) {
+			modalTitle.innerText = `${date} 성적 수정`;
+			scoreInput.value = score;
+			maxScoreInput.value = maxScore;
+			deleteBtn.style.display = 'block';
+			} else {
+			modalTitle.innerText = `${date} 새 점수 입력`;
+			scoreInput.value = '';
+			maxScoreInput.value = ''; // 원장님 요청대로 공란 적용!
+			deleteBtn.style.display = 'none';
+			}
+
+			document.getElementById('scoreModal').style.display = 'flex';
+			}
+
+			function closeModal() {
+			document.getElementById('scoreModal').style.display = 'none';
+			}
+
+			function saveModalScore() {
+			const score = document.getElementById('modalScore').value;
+			const maxScore = document.getElementById('modalMaxScore').value;
+
+			if (score === "" || maxScore === "") {
+			alert("점수와 만점 기준을 모두 입력해주세요!");
+			return;
+			}
 
 			if (Number(score) > Number(maxScore)) {
 			alert("획득 점수가 만점보다 클 수 없습니다.");
 			return;
 			}
 
-			db.collection("scores").add({
-			name: name,
-			date: date,
+			if (editDocId) {
+			// 기존 성적 덮어쓰기
+			db.collection("scores").doc(editDocId).update({
 			score: Number(score),
 			maxScore: Number(maxScore),
 			timestamp: firebase.firestore.FieldValue.serverTimestamp()
 			}).then(() => {
-			searchReport(); // 저장 성공하면 달력을 다시 새로고침
+			closeModal();
+			searchReport();
 			});
-			}
-
-			// 🚨 달력에서 이미 점수가 있는 칸을 눌렀을 때 수정/삭제하는 기능
-			function editDailyScore(date, name, docId, oldScore, oldMaxScore) {
-			const action = confirm(`[${date}]\n${name} 학생의 성적(${oldScore}/${oldMaxScore})을 수정하시겠습니까?\n\n* 확인 : 점수 수정하기\n* 취소 : 점수 삭제 메뉴로 이동`);
-
-			if (action) {
-			// 수정 모드
-			const score = prompt(`새로운 획득 점수를 입력하세요:`, oldScore);
-			if (score === null || score.trim() === "") return;
-
-			const maxScore = prompt(`새로운 만점 기준을 입력하세요:`, oldMaxScore);
-			if (maxScore === null || maxScore.trim() === "") return;
-
-			if (Number(score) > Number(maxScore)) {
-			alert("획득 점수가 만점보다 클 수 없습니다.");
-			return;
-			}
-
-			db.collection("scores").doc(docId).update({
+			} else {
+			// 새 성적 저장하기
+			db.collection("scores").add({
+			name: editName,
+			date: editDate,
 			score: Number(score),
 			maxScore: Number(maxScore),
 			timestamp: firebase.firestore.FieldValue.serverTimestamp()
-			}).then(() => searchReport());
-			} else {
-			// 취소를 누르면 삭제할 거냐고 한 번 더 물어봄
-			if (confirm(`정말로 ${date} 날짜의 성적을 삭제하시겠습니까?`)) {
-			db.collection("scores").doc(docId).delete().then(() => searchReport());
+			}).then(() => {
+			closeModal();
+			searchReport();
+			});
 			}
 			}
+
+			function deleteModalScore() {
+			if (confirm(`정말로 ${editDate} 날짜의 성적을 삭제하시겠습니까?`)) {
+			db.collection("scores").doc(editDocId).delete().then(() => {
+			closeModal();
+			searchReport();
+			});
 			}
+			}
+			// 🚨 세련된 모달창 기능 끝!
 
 			function saveEvaluation() {
 			const searchName = document.getElementById('studentSelector').value;
