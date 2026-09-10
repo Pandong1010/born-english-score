@@ -46,8 +46,7 @@
               "RelativeToolTip": "parent.html",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-09-09T00:30:44.815Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-09T00:30:44.815Z"
             },
             {
               "$type": "Document",
@@ -81,7 +80,7 @@
               "RelativeDocumentMoniker": "report.html",
               "ToolTip": "C:\\Users\\biss2\\source\\repos\\born-english-score\\born-english-score\\report.html",
               "RelativeToolTip": "report.html",
-              "ViewState": "AgIAANUBAAAAAAAAAAAEwO8BAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAMoBAAAAAAAAAAAEwOQBAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2026-08-09T14:54:46.345Z",
               "EditorCaption": ""
@@ -109,10 +108,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2026-08-09T14:36:46.963Z"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             }
           ]
         }
