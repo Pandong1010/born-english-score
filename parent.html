@@ -18,15 +18,14 @@
 					}
 					header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
-					/* 🚨 시바 로고 스타일 추가 */
+					/* 🚨 두 배 커진 시바 로고 유지 */
 					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
 
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
 					.student-title { font-size: 16px; font-weight: 800; color: #E11D48; margin-top: 8px; }
 
-					.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px; }
-					.week-btn { border: none; background: none; font-size: 20px; color: #1E3A8A; cursor: pointer; font-weight: bold; padding: 5px 10px;}
-					.week-btn:hover { color: #3B82F6; }
+					/* 🚨 양옆 화살표 버튼을 없애고, 제목을 정중앙에 예쁘게 배치했습니다 */
+					.week-nav { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; padding: 0 10px; }
 					.month-title { text-align: center; font-size: 16px; font-weight: bold; color: #374151; margin: 0; }
 
 					.calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; }
@@ -56,16 +55,14 @@
 
 		<div class="app-container" id="mainContainer" style="display: none;">
 			<header>
-				<!-- 🚨 여기에 로고 이미지가 들어갔습니다 -->
 				<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
 					<h1 class="brand-title">BORN 영어학원</h1>
 					<div class="student-title" id="headerStudentName">학생 주간 성적표</div>
 				</header>
 
+			<!-- 🚨 화살표(◀ ▶)가 빠지고 이번 주 날짜만 깔끔하게 보입니다 -->
 			<div class="week-nav">
-				<button class="week-btn" onclick="changeWeek(-1)">◀</button>
 				<div class="month-title" id="weekTitle">이번 주 성적</div>
-				<button class="week-btn" onclick="changeWeek(1)">▶</button>
 			</div>
 
 			<div class="calendar-grid">
@@ -120,11 +117,6 @@
 			loadReport();
 			}
 			};
-
-			function changeWeek(offset) {
-			currentViewDate.setDate(currentViewDate.getDate() + (offset * 7));
-			loadReport();
-			}
 
 			function loadReport() {
 			const d = new Date(currentViewDate);
