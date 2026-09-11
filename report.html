@@ -15,7 +15,7 @@
 					width: 100%; max-width: 480px; min-height: 100vh;
 					background-color: #FFF; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 					padding: 30px 20px; box-sizing: border-box;
-					position: relative; /* 모달창 위치 기준점 */
+					position: relative;
 					}
 					header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
@@ -53,6 +53,12 @@
 					.day-cell.has-score { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; font-weight: 600; }
 					.day-cell.has-score:hover { background-color: #DBEAFE; }
 
+					/* 🚨 결석 및 수업 없음 상태일 때의 달력 배경색 스타일 추가 */
+					.day-cell.status-absent { background: #FEF2F2; border-color: #FECACA; }
+					.day-cell.status-absent:hover { background: #FEE2E2; }
+					.day-cell.status-noclass { background: #F3F4F6; border-color: #E5E7EB; }
+					.day-cell.status-noclass:hover { background: #E5E7EB; }
+
 					.score-label { display: block; font-size: 12px; color: #E11D48; margin-top: 4px; font-weight: bold; letter-spacing: -0.5px; }
 					.empty-label { display: block; font-size: 11px; color: #D1D5DB; margin-top: 4px; font-weight: normal; }
 
@@ -83,7 +89,6 @@
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; }
 					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
 
-					/* 🚨 새롭게 추가된 깔끔한 앱 전용 모달(입력창) 디자인 */
 					.modal-overlay {
 					display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
 					background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
@@ -93,6 +98,11 @@
 					padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 					}
 					.modal-title { font-size: 16px; font-weight: 700; color: #1E3A8A; margin: 0 0 15px 0; text-align: center; }
+
+					/* 모달 인풋 관련 스타일 */
+					.modal-field { margin-bottom: 15px; }
+					.modal-field label { display: block; font-size: 12px; font-weight: 600; color: #4B5563; margin-bottom: 6px; }
+					.modal-field select { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #D1D5DB; border-radius: 8px; outline: none; }
 					.modal-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
 					.modal-input-group div { flex: 1; }
 					.modal-input-group label { display: block; font-size: 12px; font-weight: 600; color: #4B5563; margin-bottom: 6px; }
@@ -101,6 +111,7 @@
 					border-radius: 8px; box-sizing: border-box; outline: none; text-align: center;
 					}
 					.modal-input-group input:focus { border-color: #3B82F6; }
+
 					.modal-actions { display: flex; gap: 8px; }
 					.btn-modal-cancel { flex: 1; padding: 12px; background: #F3F4F6; color: #4B5563; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 					.btn-modal-save { flex: 1; padding: 12px; background: #3B82F6; color: #FFF; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -167,11 +178,21 @@
 			</div>
 		</div>
 
-		<!-- 🚨 브라우저 팝업 대신 사용할 세련된 화면 내 자체 팝업창(모달) -->
+		<!-- 🚨 모달(입력창)에 출결 상태 선택 드롭다운이 추가되었습니다 -->
 		<div id="scoreModal" class="modal-overlay">
 			<div class="modal-box">
-				<h3 id="modalTitle" class="modal-title">점수 입력</h3>
-				<div class="modal-input-group">
+				<h3 id="modalTitle" class="modal-title">기록 입력</h3>
+
+				<div class="modal-field">
+					<label>출결 상태</label>
+					<select id="modalStatus" onchange="toggleScoreInputs()">
+						<option value="present">✅ 정상 등원 (점수 입력)</option>
+						<option value="absent">🚨 결석</option>
+						<option value="no_class">➖ 수업 없음</option>
+					</select>
+				</div>
+
+				<div class="modal-input-group" id="scoreInputArea">
 					<div>
 						<label>만점 기준</label>
 						<input type="number" id="modalMaxScore">
@@ -181,11 +202,12 @@
 						<input type="number" id="modalScore" placeholder="예: 95">
                 </div>
 				</div>
+
 				<div class="modal-actions">
 					<button class="btn-modal-cancel" onclick="closeModal()">취소</button>
 					<button class="btn-modal-save" onclick="saveModalScore()">저장하기</button>
 				</div>
-				<button class="btn-modal-delete" id="modalDeleteBtn" onclick="deleteModalScore()">🗑️ 이 날짜 성적 삭제</button>
+				<button class="btn-modal-delete" id="modalDeleteBtn" onclick="deleteModalScore()">🗑️ 이 날짜 기록 삭제</button>
 			</div>
 		</div>
 
@@ -204,7 +226,6 @@
 			let currentViewDate = new Date();
 			let currentMondayString = "";
 
-			// 🚨 모달(입력창) 처리를 위한 변수들
 			let editDocId = null;
 			let editDate = null;
 			let editName = null;
@@ -300,7 +321,12 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (weekDates.includes(data.date)) {
-                        scoresData[data.date] = { id: doc.id, score: data.score, maxScore: data.maxScore };
+                        scoresData[data.date] = { 
+                            id: doc.id, 
+                            score: data.score, 
+                            maxScore: data.maxScore,
+                            status: data.status || 'present' // 예전 데이터는 기본으로 '정상' 처리
+                        };
                     }
                 });
 
@@ -314,19 +340,31 @@
 
                     if (scoresData[dateString]) {
                         const data = scoresData[dateString];
-                        totalScore += data.score;
-                        totalMaxScore += data.maxScore;
-                        
-                        // 기존 투박한 함수 대신 세련된 모달창 열기 함수를 연결했습니다.
-                        calendarDays.innerHTML += `
-                            <div class="day-cell has-score" onclick="openModal('${dateString}', '${searchName}', '${data.id}', ${data.score}, ${data.maxScore})">
+                        let displayHtml = '';
+                        let cellClass = 'day-cell has-score';
+
+                        // 🚨 상태에 따라 다르게 표시합니다.
+                        if (data.status === 'absent') {
+                            displayHtml = `<span class="score-label" style="color:#EF4444; font-size:13px;">결석</span>`;
+			cellClass += ' status-absent';
+			} else if (data.status === 'no_class') {
+			displayHtml = `<span class="score-label" style="color:#9CA3AF; font-size:13px;">수업 없음</span>`;
+			cellClass += ' status-noclass';
+			} else {
+			displayHtml = `<span class="score-label">${data.score}/${data.maxScore}</span>`;
+			totalScore += data.score;
+			totalMaxScore += data.maxScore;
+			}
+
+			calendarDays.innerHTML += `
+			<div class="${cellClass}" onclick="openModal('${dateString}', '${searchName}', '${data.id}', ${data.score}, ${data.maxScore}, '${data.status}')">
 				${dayNum}
-				<span class="score-label">${data.score}/${data.maxScore}</span>
+				${displayHtml}
 			</div>
 			`;
 			} else {
 			calendarDays.innerHTML += `
-			<div class="day-cell" onclick="openModal('${dateString}', '${searchName}', null, '', '')">
+			<div class="day-cell" onclick="openModal('${dateString}', '${searchName}', null, '', '', 'present')">
 				${dayNum}
 				<span class="empty-label">+ 입력</span>
 			</div>
@@ -339,7 +377,7 @@
 			const avgScore = Math.round((totalScore / totalMaxScore) * 100);
 			avgBox.innerText = `🏆 이번 주 평균 환산 점수: ${avgScore}점`;
 			} else {
-			avgBox.innerText = `이번 주 입력된 성적이 없습니다.`;
+			avgBox.innerText = `이번 주 계산될 성적이 없습니다.`;
 			}
 
 			document.getElementById('calendarArea').style.display = 'block';
@@ -359,8 +397,18 @@
 			});
 			}
 
-			// 🚨 세련된 모달창 기능들 시작!
-			function openModal(date, name, docId, score, maxScore) {
+			// 상태값(결석/수업없음)에 따라 점수 입력칸을 숨기거나 보여줍니다.
+			function toggleScoreInputs() {
+			const status = document.getElementById('modalStatus').value;
+			const scoreArea = document.getElementById('scoreInputArea');
+			if (status === 'present') {
+			scoreArea.style.display = 'flex';
+			} else {
+			scoreArea.style.display = 'none';
+			}
+			}
+
+			function openModal(date, name, docId, score, maxScore, status) {
 			editDocId = docId;
 			editDate = date;
 			editName = name;
@@ -369,20 +417,22 @@
 			const deleteBtn = document.getElementById('modalDeleteBtn');
 			const scoreInput = document.getElementById('modalScore');
 			const maxScoreInput = document.getElementById('modalMaxScore');
+			const statusInput = document.getElementById('modalStatus');
 
-			// 점수가 있으면 수정 모드, 없으면 새로 입력 모드로 창 모양을 바꿔줍니다.
 			if (docId) {
-			modalTitle.innerText = `${date} 성적 수정`;
-			scoreInput.value = score;
-			maxScoreInput.value = maxScore;
+			modalTitle.innerText = `${date} 기록 수정`;
+			statusInput.value = status;
+			scoreInput.value = score !== null ? score : '';
+			maxScoreInput.value = maxScore !== null ? maxScore : '';
 			deleteBtn.style.display = 'block';
 			} else {
-			modalTitle.innerText = `${date} 새 점수 입력`;
+			modalTitle.innerText = `${date} 새 기록 입력`;
+			statusInput.value = 'present';
 			scoreInput.value = '';
-			maxScoreInput.value = ''; // 원장님 요청대로 공란 적용!
+			maxScoreInput.value = '';
 			deleteBtn.style.display = 'none';
 			}
-
+			toggleScoreInputs();
 			document.getElementById('scoreModal').style.display = 'flex';
 			}
 
@@ -391,38 +441,41 @@
 			}
 
 			function saveModalScore() {
-			const score = document.getElementById('modalScore').value;
-			const maxScore = document.getElementById('modalMaxScore').value;
+			const status = document.getElementById('modalStatus').value;
+			let score = 0;
+			let maxScore = 0;
+
+			// 정상 등원일 때만 점수 유효성 검사를 합니다.
+			if (status === 'present') {
+			score = document.getElementById('modalScore').value;
+			maxScore = document.getElementById('modalMaxScore').value;
 
 			if (score === "" || maxScore === "") {
 			alert("점수와 만점 기준을 모두 입력해주세요!");
 			return;
 			}
-
 			if (Number(score) > Number(maxScore)) {
 			alert("획득 점수가 만점보다 클 수 없습니다.");
 			return;
 			}
+			}
+
+			const payload = {
+			name: editName,
+			date: editDate,
+			status: status,
+			score: status === 'present' ? Number(score) : null,
+			maxScore: status === 'present' ? Number(maxScore) : null,
+			timestamp: firebase.firestore.FieldValue.serverTimestamp()
+			};
 
 			if (editDocId) {
-			// 기존 성적 덮어쓰기
-			db.collection("scores").doc(editDocId).update({
-			score: Number(score),
-			maxScore: Number(maxScore),
-			timestamp: firebase.firestore.FieldValue.serverTimestamp()
-			}).then(() => {
+			db.collection("scores").doc(editDocId).update(payload).then(() => {
 			closeModal();
 			searchReport();
 			});
 			} else {
-			// 새 성적 저장하기
-			db.collection("scores").add({
-			name: editName,
-			date: editDate,
-			score: Number(score),
-			maxScore: Number(maxScore),
-			timestamp: firebase.firestore.FieldValue.serverTimestamp()
-			}).then(() => {
+			db.collection("scores").add(payload).then(() => {
 			closeModal();
 			searchReport();
 			});
@@ -430,14 +483,13 @@
 			}
 
 			function deleteModalScore() {
-			if (confirm(`정말로 ${editDate} 날짜의 성적을 삭제하시겠습니까?`)) {
+			if (confirm(`정말로 ${editDate} 날짜의 기록을 삭제하시겠습니까?`)) {
 			db.collection("scores").doc(editDocId).delete().then(() => {
 			closeModal();
 			searchReport();
 			});
 			}
 			}
-			// 🚨 세련된 모달창 기능 끝!
 
 			function saveEvaluation() {
 			const searchName = document.getElementById('studentSelector').value;
