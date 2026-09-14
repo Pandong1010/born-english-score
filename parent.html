@@ -32,7 +32,6 @@
 
 					.day-cell.has-score { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; font-weight: 600; }
 
-					/* 🚨 결석 및 수업 없음 상태일 때의 달력 배경색 스타일 추가 */
 					.day-cell.status-absent { background: #FEF2F2; border-color: #FECACA; }
 					.day-cell.status-noclass { background: #F3F4F6; border-color: #E5E7EB; }
 
@@ -111,10 +110,21 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			studentName = urlParams.get('name');
 
+			// 🚨 링크에 선생님이 심어둔 특정 날짜(&date=)가 있는지 확인합니다!
+			const specificDate = urlParams.get('date');
+
 			if (!studentName) {
 			document.getElementById('errorContainer').style.display = "block";
 			} else {
 			document.getElementById('headerStudentName').innerText = `🏆 ${studentName} 학생 주간 성적표`;
+
+			// 🚨 선생님이 보낸 링크에 날짜가 있으면 그 주로 이동하고, 없으면 그냥 오늘(이번 주)을 보여줍니다.
+			if (specificDate) {
+			currentViewDate = new Date(specificDate);
+			} else {
+			currentViewDate = new Date();
+			}
+
 			document.getElementById('mainContainer').style.display = "block";
 			loadReport();
 			}
@@ -178,7 +188,6 @@
                         let displayHtml = '';
                         let cellClass = 'day-cell has-score';
 
-                        // 🚨 상태에 따라 다르게 표시합니다. 학부모님용 화면은 클릭 기능(onclick)이 없습니다.
                         if (data.status === 'absent') {
                             displayHtml = `<span class="score-label" style="color:#EF4444; font-size:13px;">결석</span>`;
 			cellClass += ' status-absent';
