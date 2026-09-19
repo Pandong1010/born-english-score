@@ -1,4 +1,17 @@
-﻿<!DOCTYPE html>
+﻿수석 개발자님, 학원 운영의 디테일이 살아있는 엄청난 기획력입니다!
+
+말씀하신 4가지 수정 사항을 완벽하게 분석했습니다.
+특히 PASS일 때 굳이 상담 날짜를 잡을 필요가 없다는 점, 그리고 학부모님께 따뜻한 코멘트를 남겨야 한다는 점은 실제 학원 현장이 아니면 생각하기 힘든 진짜 '운영 노하우'네요.
+
+요청하신 1~3번 기능(PASS 시 날짜 생략, 코멘트 추가, 개별 삭제 기능)을 모두 반영한 코드를 먼저 드리고, 4번 알림 기능에 대해서는 맨 아래에서 아주 현실적이고 확실한 방법을 제안해 드리겠습니다!
+
+1. achievement.html (선생님용 평가 관리)
+변경점: 코멘트 입력창 추가, PASS 선택 시 날짜 지정 칸이 숨겨짐, 전송 내역에 삭제(🗑️) 버튼 추가, 하단 통합 메뉴바 적용.
+
+기존 코드를 지우고 아래 코드로 싹 덮어씌워 주세요!
+
+HTML
+<!DOCTYPE html>
 <html lang="ko">
 	<head>
 		<meta charset="UTF-8">
@@ -9,7 +22,6 @@
 					.app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #FFF; padding: 30px 20px; box-sizing: border-box; }
 					header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
-					/* 🚨 시바 로고 160px 적용 */
 					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
 					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
@@ -17,8 +29,8 @@
 					.card { background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
 					.form-group { margin-bottom: 15px; }
 					.form-group label { display: block; font-size: 13px; font-weight: 600; color: #4B5563; margin-bottom: 6px; }
-					.form-group select, .form-group input { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #CBD5E1; border-radius: 8px; box-sizing: border-box; outline: none; }
-					.form-group select:focus, .form-group input:focus { border-color: #3B82F6; }
+					.form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #CBD5E1; border-radius: 8px; box-sizing: border-box; outline: none; font-family: inherit;}
+					.form-group select:focus, .form-group input:focus, .form-group textarea:focus { border-color: #3B82F6; }
 
 					.radio-group { display: flex; gap: 10px; }
 					.radio-label { flex: 1; text-align: center; background: #FFF; border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; cursor: pointer; font-weight: bold; font-size: 14px; color: #64748B; transition: 0.2s; }
@@ -32,7 +44,7 @@
 					.btn-submit:hover { background-color: #152C6B; }
 
 					.history-list { margin-top: 30px; }
-					.history-item { background: #FFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+					.history-item { background: #FFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 15px; margin-bottom: 10px; position: relative;}
 					.history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 					.history-name { font-weight: bold; font-size: 15px; color: #1E3A8A; }
 					.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
@@ -40,11 +52,19 @@
 					.badge-unpass { background: #FEE2E2; color: #991B1B; }
 
 					.parent-reply { font-size: 13px; color: #4B5563; background: #F3F4F6; padding: 8px; border-radius: 6px; margin-top: 10px; font-weight: 600; }
-					.parent-reply.replied { background: #FEF08A; color: #854D0E; } /* 학부모 응답 시 노란색 하이라이트 */
+					.parent-reply.replied { background: #FEF08A; color: #854D0E; }
 
 					.btn-copy { width: 100%; padding: 10px; background: #FEE500; color: #374151; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 10px; }
-					.nav-links { display: flex; justify-content: center; margin-top: 25px; }
+
+					/* 개별 삭제 버튼 스타일 */
+					.btn-delete-history { position: absolute; bottom: 15px; right: 15px; background: #FFF; border: 1px solid #FCA5A5; color: #EF4444; border-radius: 6px; padding: 6px 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+					/* 하단 메뉴 통일 (양끝 정렬) */
+					.nav-links { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 0 10px; flex-wrap: wrap; gap: 15px; }
 					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; cursor: pointer; }
+					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
+					.nav-left { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+					.divider { color: #E5E7EB; font-size: 12px; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -86,8 +106,15 @@
 					</div>
 				</div>
 
+				<!-- 코멘트 입력창 추가 -->
 				<div class="form-group">
-					<label>학부모님 선택용 후보 날짜 (이틀 지정)</label>
+					<label>원장님 코멘트 (학부모님 확인용)</label>
+					<textarea id="evalComment" rows="3" placeholder="이번 평가에 대한 코멘트를 남겨주세요."></textarea>
+				</div>
+
+				<!-- UNPASS일 때만 보이는 날짜 지정 구역 -->
+				<div class="form-group" id="dateSection" style="display: none; background: #F3F4F6; padding: 15px; border-radius: 8px;">
+					<label>⚠️ UNPASS 학부모님 상담 후보 날짜 (이틀 지정)</label>
 					<input type="date" id="dateOption1" style="margin-bottom: 8px;">
 						<input type="date" id="dateOption2">
             </div>
@@ -96,12 +123,18 @@
 			</div>
 
 			<h3 style="font-size: 15px; color: #1E3A8A; margin-bottom: 10px;">📋 최근 전송 내역 및 학부모 답변</h3>
-			<div id="historyList" class="history-list">
-				<!-- 내역이 여기에 뜹니다 -->
-			</div>
+			<div id="historyList" class="history-list"></div>
 
+			<!-- 🚨 깔끔하게 좌우로 분리된 하단 메뉴 -->
 			<div class="nav-links">
-				<a href="index.html">← 단어 점수 입력창으로 돌아가기</a>
+				<div class="nav-left">
+					<a href="manage.html">⚙️ 반/학생 관리</a>
+					<span class="divider">|</span>
+					<a href="index.html">✏️ 단어 입력</a>
+					<span class="divider">|</span>
+					<a href="report.html">📊 주간 성적</a>
+				</div>
+				<a href="master.html">👑 원장실</a>
 			</div>
 		</div>
 
@@ -138,32 +171,52 @@
 			});
 			}
 
+			// 🚨 PASS일 때 날짜 입력칸을 숨기고, UNPASS일 때 보여줍니다.
 			function selectResult(result) {
 			selectedResult = result;
 			document.getElementById('labelPass').classList.remove('selected');
 			document.getElementById('labelUnpass').classList.remove('selected');
-			if(result === 'PASS') document.getElementById('labelPass').classList.add('selected');
-			if(result === 'UNPASS') document.getElementById('labelUnpass').classList.add('selected');
+
+			const dateSection = document.getElementById('dateSection');
+
+			if(result === 'PASS') {
+			document.getElementById('labelPass').classList.add('selected');
+			dateSection.style.display = 'none';
+			}
+			if(result === 'UNPASS') {
+			document.getElementById('labelUnpass').classList.add('selected');
+			dateSection.style.display = 'block';
+			}
 			}
 
 			function saveAssessment() {
 			const name = document.getElementById('studentSelector').value;
+			const comment = document.getElementById('evalComment').value;
 			const date1 = document.getElementById('dateOption1').value;
 			const date2 = document.getElementById('dateOption2').value;
 
 			if(!name) return alert("학생을 선택해주세요.");
 			if(!selectedResult) return alert("PASS 또는 UNPASS를 선택해주세요.");
-			if(!date1 || !date2) return alert("후보 날짜 이틀을 모두 지정해주세요.");
+
+			// UNPASS인 경우에만 날짜를 검사합니다.
+			if(selectedResult === 'UNPASS' && (!date1 || !date2)) {
+			return alert("UNPASS인 경우 학부모님 상담을 위한 후보 날짜 이틀을 모두 지정해주세요.");
+			}
 
 			db.collection("assessments").add({
 			name: name,
 			result: selectedResult,
-			dateOption1: date1,
-			dateOption2: date2,
-			parentChoice: "", // 아직 학부모님이 선택하지 않은 상태
+			comment: comment,
+			dateOption1: selectedResult === 'PASS' ? '' : date1,
+			dateOption2: selectedResult === 'PASS' ? '' : date2,
+			parentChoice: "",
 			createdAt: firebase.firestore.FieldValue.serverTimestamp()
 			}).then(() => {
 			alert("성공적으로 저장되었습니다! 아래 내역에서 링크를 복사하여 카톡으로 보내주세요.");
+			// 폼 초기화
+			document.getElementById('evalComment').value = '';
+			document.getElementById('dateOption1').value = '';
+			document.getElementById('dateOption2').value = '';
 			loadHistory();
 			});
 			}
@@ -180,12 +233,21 @@
 			const data = doc.data();
 			const badgeClass = data.result === 'PASS' ? 'badge-pass' : 'badge-unpass';
 
-			// 학부모님 응답 여부에 따라 상태창 색상 변경
-			let replyHtml = `<div class="parent-reply">⏳ 아직 학부모님이 날짜를 선택하지 않았습니다.</div>`;
+			let dateHtml = '';
+			let replyHtml = '';
+
+			if(data.result === 'UNPASS') {
+			dateHtml = `<div style="font-size:12px; color:#6B7280; margin-bottom: 5px;">제시된 날짜: ${data.dateOption1} / ${data.dateOption2}</div>`;
+
 			if (data.parentChoice) {
 			replyHtml = `<div class="parent-reply replied">
 				✅ 학부모님 확정 날짜: <b>${data.parentChoice}</b>
 			</div>`;
+			} else {
+			replyHtml = `<div class="parent-reply">⏳ 아직 학부모님이 날짜를 선택하지 않았습니다.</div>`;
+			}
+			} else {
+			dateHtml = `<div style="font-size:12px; color:#059669; margin-bottom: 5px;">상담 불필요 (PASS)</div>`;
 			}
 
 			list.innerHTML += `
@@ -194,18 +256,31 @@
 					<span class="history-name">${data.name} 학생</span>
 					<span class="status-badge ${badgeClass}">${data.result}</span>
 				</div>
-				<div style="font-size:12px; color:#6B7280;">제시된 날짜: ${data.dateOption1} / ${data.dateOption2}</div>
+				${dateHtml}
+				<div style="font-size:13px; color:#333; margin-bottom:10px; background:#F8FAFC; padding:8px; border-radius:6px;">"${data.comment || '코멘트 없음'}"</div>
 				${replyHtml}
-				<button class="btn-copy" onclick="copyLink('${doc.id}')">💬 학부모님 전용 링크 복사하기</button>
+				<div style="display: flex; gap: 8px;">
+					<button class="btn-copy" style="flex: 1;" onclick="copyLink('${doc.id}')">💬 링크 복사</button>
+					<button class="btn-copy" style="background: #FEE2E2; color: #DC2626; width: 60px;" onclick="deleteAssessment('${doc.id}')">삭제</button>
+				</div>
 			</div>
 			`;
 			});
 			});
 			}
 
+			function deleteAssessment(docId) {
+			if(confirm("정말 이 전송 내역을 삭제하시겠습니까?\n삭제하면 학부모님이 해당 링크로 접속할 수 없습니다.")) {
+			db.collection("assessments").doc(docId).delete().then(() => {
+			loadHistory();
+			}).catch((error) => {
+			alert("삭제 중 오류가 발생했습니다.");
+			});
+			}
+			}
+
 			function copyLink(docId) {
 			const currentUrl = window.location.href.split('achievement.html')[0].split('?')[0];
-			// 🚨 문서 고유 ID를 암호처럼 링크에 숨겨서 보냅니다!
 			const finalLink = `${currentUrl}achievement_parent.html?id=${docId}`;
 
 			navigator.clipboard.writeText(finalLink).then(() => {
