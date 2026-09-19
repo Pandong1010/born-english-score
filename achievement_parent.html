@@ -42,10 +42,10 @@
 				<div style="color: #6C757D; font-size: 14px; font-weight: 600;">성취도 평가 결과 안내</div>
 
 				<div class="result-box">
+					<!-- 🚨 [반 이름] 학생 이름 (O월 성취도) 가 명확하게 표시됩니다 -->
 					<div class="student-name" id="displayStudentName"></div>
 					<div id="displayResult" class="result-badge"></div>
 
-					<!-- 선생님 코멘트가 나오는 구역 -->
 					<div class="teacher-comment">
 						<b>📝 원장님 코멘트</b>
 						<span id="displayComment"></span>
@@ -108,13 +108,16 @@
 			const data = doc.data();
 			document.getElementById('mainContainer').style.display = "block";
 
-			document.getElementById('displayStudentName').innerText = `${data.name} 학생`;
+			// 🚨 반 이름과 평가 월(Month)을 포함하여 타이틀을 렌더링합니다.
+			const classNameStr = data.className ? `[${data.className}] ` : "";
+			const monthStr = data.displayMonth ? ` (${data.displayMonth} 성취도)` : "";
+			document.getElementById('displayStudentName').innerText = `${classNameStr}${data.name} 학생${monthStr}`;
+
 			document.getElementById('displayComment').innerText = data.comment || "작성된 코멘트가 없습니다.";
 
 			const resultBadge = document.getElementById('displayResult');
 			resultBadge.innerText = data.result;
 
-			// 🚨 PASS일 때와 UNPASS일 때 화면 처리를 나눕니다.
 			if(data.result === 'PASS') {
 			resultBadge.classList.add('badge-pass');
 			document.getElementById('dateSelectionArea').style.display = "none";
