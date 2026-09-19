@@ -28,7 +28,9 @@
 					.btn-date:hover { background-color: #DBEAFE; }
 
 					.success-msg { display: none; margin-top: 20px; padding: 20px; background: #ECFDF5; border: 2px solid #6EE7B7; border-radius: 12px; color: #065F46; font-weight: bold; font-size: 15px; }
-					.error-msg { margin-top: 50px; font-weight: bold; color: #EF4444; }
+
+					/* 에러 메시지 스타일 강화 */
+					.error-msg { margin-top: 50px; font-weight: bold; color: #EF4444; border: 1px solid #FCA5A5; background: #FEF2F2; padding: 20px; border-radius: 12px; line-height: 1.6;}
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -42,7 +44,6 @@
 				<div style="color: #6C757D; font-size: 14px; font-weight: 600;">성취도 평가 결과 안내</div>
 
 				<div class="result-box">
-					<!-- 🚨 [반 이름] 학생 이름 (O월 성취도) 가 명확하게 표시됩니다 -->
 					<div class="student-name" id="displayStudentName"></div>
 					<div id="displayResult" class="result-badge"></div>
 
@@ -67,8 +68,12 @@
 				</div>
 			</div>
 
-		<div id="errorContainer" class="error-msg" style="display: none;">
-			잘못된 접근이거나 이미 삭제된 내역입니다.
+		<!-- 🚨 오류가 발생했을 때 정확한 이유를 보여주도록 업그레이드! -->
+		<div class="app-container" id="errorContainer" style="display: none;">
+			<div class="error-msg">
+				⚠️ 잘못된 접근이거나 삭제된 내역입니다.<br>
+					<span id="errorReason" style="font-size: 13px; color: #9CA3AF; font-weight: normal; margin-top: 10px; display: block;"></span>
+				</div>
 		</div>
 
 		<script>
@@ -87,12 +92,17 @@
 			let option1 = "";
 			let option2 = "";
 
+			function showError(reason) {
+			document.getElementById('errorContainer').style.display = "block";
+			document.getElementById('errorReason').innerText = reason;
+			}
+
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
 			docId = urlParams.get('id');
 
 			if (!docId) {
-			document.getElementById('errorContainer').style.display = "block";
+			showError("오류 원인: 주소창에 학생 고유 ID가 없습니다. 선생님이 보내주신 원본 링크 전체를 복사해서 열어주세요.");
 			} else {
 			loadAssessmentInfo();
 			}
@@ -101,14 +111,13 @@
 			function loadAssessmentInfo() {
 			db.collection("assessments").doc(docId).get().then((doc) => {
 			if (!doc.exists) {
-			document.getElementById('errorContainer').style.display = "block";
+			showError("오류 원인: 해당 성취도 평가 내역이 선생님에 의해 삭제되었거나 존재하지 않습니다.");
 			return;
 			}
 
 			const data = doc.data();
 			document.getElementById('mainContainer').style.display = "block";
 
-			// 🚨 반 이름과 평가 월(Month)을 포함하여 타이틀을 렌더링합니다.
 			const classNameStr = data.className ? `[${data.className}] ` : "";
 			const monthStr = data.displayMonth ? ` (${data.displayMonth} 성취도)` : "";
 			document.getElementById('displayStudentName').innerText = `${classNameStr}${data.name} 학생${monthStr}`;
@@ -139,7 +148,7 @@
 			}
 			}
 			}).catch(error => {
-			document.getElementById('errorContainer').style.display = "block";
+			showError("오류 원인: 데이터를 불러오는 중 통신 오류가 발생했습니다. (" + error.message + ")");
 			});
 			}
 

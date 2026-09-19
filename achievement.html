@@ -3,32 +3,51 @@
 	<head>
 		<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>BORN 영어학원 성취도 평가 안내</title>
+				<title>BORN 영어학원 성취도 평가 관리</title>
 				<style>
 					body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background-color: #F4F7F6; color: #333; display: flex; justify-content: center; }
-					.app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #FFF; padding: 40px 20px; box-sizing: border-box; text-align: center;}
+					.app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #FFF; padding: 30px 20px; box-sizing: border-box; }
+					header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
-					.logo-img { width: 160px; height: auto; margin-bottom: 15px; border-radius: 12px; }
-					.brand-title { font-size: 20px; font-weight: 800; color: #1E3A8A; margin: 0 0 5px 0; }
+					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
+					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
+					.brand-subtitle { font-size: 13px; color: #6C757D; margin-top: 4px; }
 
-					.result-box { margin: 25px 0; padding: 25px 15px; border-radius: 12px; background: #F8FAFC; border: 2px solid #E2E8F0; }
-					.student-name { font-size: 18px; font-weight: bold; color: #334155; margin-bottom: 15px; }
-					.result-badge { display: inline-block; padding: 8px 20px; border-radius: 30px; font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px;}
-					.badge-pass { background: #D1FAE5; color: #059669; border: 2px solid #34D399; }
-					.badge-unpass { background: #FEE2E2; color: #DC2626; border: 2px solid #F87171; }
+					.card { background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+					.form-group { margin-bottom: 15px; }
+					.form-group label { display: block; font-size: 13px; font-weight: 600; color: #4B5563; margin-bottom: 6px; }
+					.form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #CBD5E1; border-radius: 8px; box-sizing: border-box; outline: none; font-family: inherit;}
+					.form-group select:focus, .form-group input:focus, .form-group textarea:focus { border-color: #3B82F6; }
 
-					.teacher-comment { font-size: 14px; color: #4B5563; background: #FFF; border: 1px solid #CBD5E1; padding: 15px; border-radius: 8px; text-align: left; line-height: 1.5; white-space: pre-wrap;}
-					.teacher-comment b { color: #1E3A8A; display: block; margin-bottom: 5px; font-size: 13px;}
+					.radio-group { display: flex; gap: 10px; }
+					.radio-label { flex: 1; text-align: center; background: #FFF; border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; cursor: pointer; font-weight: bold; font-size: 14px; color: #64748B; transition: 0.2s; }
+					.radio-label input { display: none; }
+					.radio-label input:checked + span.pass { color: #10B981; }
+					.radio-label input:checked + span.unpass { color: #EF4444; }
+					.radio-label.selected.pass-box { border-color: #10B981; background: #ECFDF5; }
+					.radio-label.selected.unpass-box { border-color: #EF4444; background: #FEF2F2; }
 
-					.date-section { margin-top: 30px; text-align: left; background: #FFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #E5E7EB;}
-					.date-section h3 { font-size: 15px; color: #1E3A8A; margin-top: 0; margin-bottom: 15px; text-align: center;}
-					.instruction { font-size: 13px; color: #6B7280; text-align: center; margin-bottom: 20px; word-break: keep-all; line-height: 1.5; }
+					.btn-submit { width: 100%; padding: 14px; font-size: 15px; font-weight: bold; color: #FFF; background-color: #1E3A8A; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+					.btn-submit:hover { background-color: #152C6B; }
 
-					.btn-date { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; color: #1E3A8A; background-color: #EFF6FF; border: 2px solid #BFDBFE; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
-					.btn-date:hover { background-color: #DBEAFE; }
+					.history-list { margin-top: 30px; }
+					.history-item { background: #FFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 15px; margin-bottom: 10px; position: relative;}
+					.history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+					.history-name { font-weight: bold; font-size: 15px; color: #1E3A8A; }
+					.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+					.badge-pass { background: #D1FAE5; color: #065F46; }
+					.badge-unpass { background: #FEE2E2; color: #991B1B; }
 
-					.success-msg { display: none; margin-top: 20px; padding: 20px; background: #ECFDF5; border: 2px solid #6EE7B7; border-radius: 12px; color: #065F46; font-weight: bold; font-size: 15px; }
-					.error-msg { margin-top: 50px; font-weight: bold; color: #EF4444; }
+					.parent-reply { font-size: 13px; color: #4B5563; background: #F3F4F6; padding: 8px; border-radius: 6px; margin-top: 10px; font-weight: 600; }
+					.parent-reply.replied { background: #FEF08A; color: #854D0E; }
+
+					.btn-copy { width: 100%; padding: 10px; background: #FEE500; color: #374151; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 10px; }
+
+					.nav-links { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 0 10px; flex-wrap: wrap; gap: 15px; }
+					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; cursor: pointer; }
+					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
+					.nav-left { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+					.divider { color: #E5E7EB; font-size: 12px; }
 				</style>
 
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -36,39 +55,67 @@
 			</head>
 	<body>
 
-		<div class="app-container" id="mainContainer" style="display: none;">
-			<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
-				<h1 class="brand-title">BORN 영어학원</h1>
-				<div style="color: #6C757D; font-size: 14px; font-weight: 600;">성취도 평가 결과 안내</div>
+		<div class="app-container">
+			<header>
+				<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
+					<h1 class="brand-title">BORN 영어학원</h1>
+					<div class="brand-subtitle">성취도 평가 & 상담일정 관리</div>
+				</header>
 
-				<div class="result-box">
-					<!-- 🚨 [반 이름] 학생 이름 (O월 성취도) 가 명확하게 표시됩니다 -->
-					<div class="student-name" id="displayStudentName"></div>
-					<div id="displayResult" class="result-badge"></div>
-
-					<div class="teacher-comment">
-						<b>📝 원장님 코멘트</b>
-						<span id="displayComment"></span>
+			<div class="card">
+				<div class="form-group">
+					<label>반 및 학생 선택</label>
+					<div style="display:flex; gap:8px;">
+						<select id="classSelector" onchange="loadStudents()">
+							<option value="">반 선택</option>
+						</select>
+						<select id="studentSelector">
+							<option value="">학생 선택</option>
+						</select>
 					</div>
 				</div>
 
-				<div class="date-section" id="dateSelectionArea" style="display: none;">
-					<h3>🗓️ 학부모님 상담 일정 선택</h3>
-					<div class="instruction">
-						안내를 위한 일정을 확인하시고,<br>원하시는 날짜를 아래 버튼을 눌러 확정해 주세요.
-            </div>
-					<button class="btn-date" id="btnDate1" onclick="submitChoice(1)"></button>
-					<button class="btn-date" id="btnDate2" onclick="submitChoice(2)"></button>
+				<div class="form-group">
+					<label>평가 결과</label>
+					<div class="radio-group">
+						<label class="radio-label pass-box" id="labelPass" onclick="selectResult('PASS')">
+							<input type="radio" name="testResult" value="PASS">
+								<span class="pass">✅ PASS</span>
+							</label>
+						<label class="radio-label unpass-box" id="labelUnpass" onclick="selectResult('UNPASS')">
+							<input type="radio" name="testResult" value="UNPASS">
+								<span class="unpass">🚨 UNPASS</span>
+							</label>
+					</div>
 				</div>
 
-				<div class="success-msg" id="successArea">
-					✅ <span id="confirmedDate"></span><br>일정 확정이 완료되었습니다. 감사합니다!
-        
+				<div class="form-group">
+					<label>원장님 코멘트 (학부모님 확인용)</label>
+					<textarea id="evalComment" rows="3" placeholder="이번 평가에 대한 코멘트를 남겨주세요."></textarea>
 				</div>
+
+				<div class="form-group" id="dateSection" style="display: none; background: #F3F4F6; padding: 15px; border-radius: 8px;">
+					<label>⚠️ UNPASS 학부모님 상담 후보 날짜 (이틀 지정)</label>
+					<input type="date" id="dateOption1" style="margin-bottom: 8px;">
+						<input type="date" id="dateOption2">
+            </div>
+
+				<button class="btn-submit" onclick="saveAssessment()">평가 전송 준비 (저장)</button>
 			</div>
 
-		<div id="errorContainer" class="error-msg" style="display: none;">
-			잘못된 접근이거나 이미 삭제된 내역입니다.
+			<h3 style="font-size: 15px; color: #1E3A8A; margin-bottom: 10px;">📋 최근 전송 내역 및 학부모 답변</h3>
+			<div id="historyList" class="history-list"></div>
+
+			<div class="nav-links">
+				<div class="nav-left">
+					<a href="manage.html">⚙️ 반/학생 관리</a>
+					<span class="divider">|</span>
+					<a href="index.html">✏️ 단어 입력</a>
+					<span class="divider">|</span>
+					<a href="report.html">📊 주간 성적</a>
+				</div>
+				<a href="master.html">👑 원장실</a>
+			</div>
 		</div>
 
 		<script>
@@ -83,80 +130,179 @@
 			firebase.initializeApp(firebaseConfig);
 			const db = firebase.firestore();
 
-			let docId = "";
-			let option1 = "";
-			let option2 = "";
+			let selectedResult = '';
 
 			window.onload = function() {
-			const urlParams = new URLSearchParams(window.location.search);
-			docId = urlParams.get('id');
-
-			if (!docId) {
-			document.getElementById('errorContainer').style.display = "block";
-			} else {
-			loadAssessmentInfo();
-			}
+			db.collection("classes").orderBy("createdAt", "asc").get().then((snapshot) => {
+			const classSelector = document.getElementById('classSelector');
+			snapshot.forEach(doc => { classSelector.innerHTML += `<option value="${doc.id}">${doc.data().name}</option>`; });
+			});
+			loadHistory();
 			};
 
-			function loadAssessmentInfo() {
-			db.collection("assessments").doc(docId).get().then((doc) => {
-			if (!doc.exists) {
-			document.getElementById('errorContainer').style.display = "block";
-			return;
+			function loadStudents() {
+			const classId = document.getElementById('classSelector').value;
+			const studentSelector = document.getElementById('studentSelector');
+			studentSelector.innerHTML = '<option value="">학생 선택</option>';
+			if(!classId) return;
+
+			db.collection("students").where("classId", "==", classId).get().then((snapshot) => {
+			snapshot.forEach(doc => { studentSelector.innerHTML += `<option value="${doc.data().name}">${doc.data().name}</option>`; });
+			});
 			}
 
+			function selectResult(result) {
+			selectedResult = result;
+			document.getElementById('labelPass').classList.remove('selected');
+			document.getElementById('labelUnpass').classList.remove('selected');
+			const dateSection = document.getElementById('dateSection');
+
+			if(result === 'PASS') {
+			document.getElementById('labelPass').classList.add('selected');
+			dateSection.style.display = 'none';
+			}
+			if(result === 'UNPASS') {
+			document.getElementById('labelUnpass').classList.add('selected');
+			dateSection.style.display = 'block';
+			}
+			}
+
+			function saveAssessment() {
+			const classSelect = document.getElementById('classSelector');
+			const classId = classSelect.value;
+			const className = classSelect.options[classSelect.selectedIndex]?.text || '';
+			const name = document.getElementById('studentSelector').value;
+			const comment = document.getElementById('evalComment').value;
+			const date1 = document.getElementById('dateOption1').value;
+			const date2 = document.getElementById('dateOption2').value;
+
+			if(!classId || !name) return alert("반과 학생을 선택해주세요.");
+			if(!selectedResult) return alert("PASS 또는 UNPASS를 선택해주세요.");
+			if(selectedResult === 'UNPASS' && (!date1 || !date2)) {
+			return alert("UNPASS인 경우 학부모님 상담을 위한 후보 날짜 이틀을 모두 지정해주세요.");
+			}
+
+			const now = new Date();
+			const evalMonthId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+			const displayMonth = `${now.getMonth() + 1}월`;
+
+			const payload = {
+			classId: classId,
+			className: className,
+			name: name,
+			result: selectedResult,
+			comment: comment,
+			dateOption1: selectedResult === 'PASS' ? '' : date1,
+			dateOption2: selectedResult === 'PASS' ? '' : date2,
+			evaluationMonthId: evalMonthId,
+			displayMonth: displayMonth,
+			parentChoice: "",
+			timestamp: firebase.firestore.FieldValue.serverTimestamp()
+			};
+
+			db.collection("assessments")
+			.where("classId", "==", classId)
+			.where("name", "==", name)
+			.where("evaluationMonthId", "==", evalMonthId)
+			.get().then((querySnapshot) => {
+
+			if (!querySnapshot.empty) {
+			if (confirm(`⚠️ 이번 달(${displayMonth}) '${className} ${name}' 학생의 성취도 평가가 이미 존재합니다.\n새롭게 입력하신 내용으로 덮어쓰시겠습니까?`)) {
+			db.collection("assessments").doc(querySnapshot.docs[0].id).update(payload).then(() => {
+			alert("성공적으로 수정 및 덮어쓰기가 완료되었습니다.");
+			resetForm();
+			loadHistory();
+			});
+			}
+			} else {
+			payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+			db.collection("assessments").add(payload).then(() => {
+			alert("성공적으로 저장되었습니다! 아래 내역에서 링크를 복사하여 카톡으로 보내주세요.");
+			resetForm();
+			loadHistory();
+			});
+			}
+			});
+			}
+
+			function resetForm() {
+			document.getElementById('evalComment').value = '';
+			document.getElementById('dateOption1').value = '';
+			document.getElementById('dateOption2').value = '';
+			}
+
+			function loadHistory() {
+			const list = document.getElementById('historyList');
+			list.innerHTML = '불러오는 중...';
+
+			db.collection("assessments").orderBy("timestamp", "desc").limit(10).get().then((snapshot) => {
+			list.innerHTML = '';
+			if(snapshot.empty) { list.innerHTML = '<div style="text-align:center; color:#9CA3AF; font-size:13px;">아직 생성된 평가가 없습니다.</div>'; return; }
+
+			snapshot.forEach(doc => {
 			const data = doc.data();
-			document.getElementById('mainContainer').style.display = "block";
+			const badgeClass = data.result === 'PASS' ? 'badge-pass' : 'badge-unpass';
+			const displayClass = data.className ? `[${data.className}] ` : '';
+			const displayMonth = data.displayMonth ? `(${data.displayMonth} 성취도)` : '';
 
-			// 🚨 반 이름과 평가 월(Month)을 포함하여 타이틀을 렌더링합니다.
-			const classNameStr = data.className ? `[${data.className}] ` : "";
-			const monthStr = data.displayMonth ? ` (${data.displayMonth} 성취도)` : "";
-			document.getElementById('displayStudentName').innerText = `${classNameStr}${data.name} 학생${monthStr}`;
+			let dateHtml = '';
+			let replyHtml = '';
 
-			document.getElementById('displayComment').innerText = data.comment || "작성된 코멘트가 없습니다.";
-
-			const resultBadge = document.getElementById('displayResult');
-			resultBadge.innerText = data.result;
-
-			if(data.result === 'PASS') {
-			resultBadge.classList.add('badge-pass');
-			document.getElementById('dateSelectionArea').style.display = "none";
-			document.getElementById('confirmedDate').innerText = "훌륭하게 통과했습니다!";
-			document.getElementById('successArea').style.display = "block";
-			} else {
-			resultBadge.classList.add('badge-unpass');
-
+			if(data.result === 'UNPASS') {
+			dateHtml = `<div style="font-size:12px; color:#6B7280; margin-bottom: 5px;">제시된 날짜: ${data.dateOption1} / ${data.dateOption2}</div>`;
 			if (data.parentChoice) {
-			document.getElementById('dateSelectionArea').style.display = "none";
-			document.getElementById('confirmedDate').innerText = data.parentChoice;
-			document.getElementById('successArea').style.display = "block";
+			replyHtml = `<div class="parent-reply replied">
+				✅ 학부모님 확정 날짜: <b>${data.parentChoice}</b>
+			</div>`;
 			} else {
-			document.getElementById('dateSelectionArea').style.display = "block";
-			option1 = data.dateOption1;
-			option2 = data.dateOption2;
-			document.getElementById('btnDate1').innerText = `👉 ${option1} 선택하기`;
-			document.getElementById('btnDate2').innerText = `👉 ${option2} 선택하기`;
+			replyHtml = `<div class="parent-reply">⏳ 아직 학부모님이 날짜를 선택하지 않았습니다.</div>`;
 			}
+			} else {
+			dateHtml = `<div style="font-size:12px; color:#059669; margin-bottom: 5px;">상담 불필요 (PASS)</div>`;
 			}
-			}).catch(error => {
-			document.getElementById('errorContainer').style.display = "block";
+
+			list.innerHTML += `
+			<div class="history-item">
+				<div class="history-header">
+					<span class="history-name">
+						${displayClass}${data.name} 학생 <span style="font-size:12px; color:#6C757D; font-weight:normal;">${displayMonth}</span>
+					</span>
+					<span class="status-badge ${badgeClass}">${data.result}</span>
+				</div>
+				${dateHtml}
+				<div style="font-size:13px; color:#333; margin-bottom:10px; background:#F8FAFC; padding:8px; border-radius:6px;">"${data.comment || '코멘트 없음'}"</div>
+				${replyHtml}
+				<div style="display: flex; gap: 8px;">
+					<button class="btn-copy" style="flex: 1;" onclick="copyLink('${doc.id}')">💬 링크 복사</button>
+					<button class="btn-copy" style="background: #FEE2E2; color: #DC2626; width: 60px;" onclick="deleteAssessment('${doc.id}')">삭제</button>
+				</div>
+			</div>
+			`;
+			});
 			});
 			}
 
-			function submitChoice(choiceNum) {
-			const chosenDate = choiceNum === 1 ? option1 : option2;
-
-			if (confirm(`'${chosenDate}' 일정을 확정하시겠습니까?`)) {
-			db.collection("assessments").doc(docId).update({
-			parentChoice: chosenDate
-			}).then(() => {
-			document.getElementById('dateSelectionArea').style.display = "none";
-			document.getElementById('confirmedDate').innerText = chosenDate;
-			document.getElementById('successArea').style.display = "block";
-			}).catch(error => {
-			alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+			function deleteAssessment(docId) {
+			if(confirm("정말 이 전송 내역을 삭제하시겠습니까?\n삭제하면 학부모님이 해당 링크로 접속할 수 없습니다.")) {
+			db.collection("assessments").doc(docId).delete().then(() => {
+			loadHistory();
+			}).catch((error) => {
+			alert("삭제 중 오류가 발생했습니다.");
 			});
 			}
+			}
+
+			// 🚨 링크 복사 로직이 훨씬 안전하게 업그레이드되었습니다.
+			function copyLink(docId) {
+			const urlPath = window.location.href.split('?')[0];
+			const currentUrl = urlPath.substring(0, urlPath.lastIndexOf('/') + 1);
+			const finalLink = `${currentUrl}achievement_parent.html?id=${docId}`;
+
+			navigator.clipboard.writeText(finalLink).then(() => {
+			alert(`✅ 링크 복사 완료!\n학부모님 카톡방에 붙여넣기 해주세요.\n\n(생성된 링크: ${finalLink})`);
+			}).catch(err => {
+			prompt("자동 복사가 차단되었습니다. 아래 주소를 복사해 주세요:", finalLink);
+			});
 			}
 		</script>
 	</body>
