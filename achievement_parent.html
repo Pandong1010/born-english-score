@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>BORN 영어학원 성취도 평가 안내</title>
+				<style>
+					body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background-color: #F4F7F6; color: #333; display: flex; justify-content: center; }
+					.app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #FFF; padding: 40px 20px; box-sizing: border-box; text-align: center;}
+
+					/* 🚨 시바 로고 160px 유지 */
+					.logo-img { width: 160px; height: auto; margin-bottom: 15px; border-radius: 12px; }
+					.brand-title { font-size: 20px; font-weight: 800; color: #1E3A8A; margin: 0 0 5px 0; }
+
+					.result-box { margin: 25px 0; padding: 25px 15px; border-radius: 12px; background: #F8FAFC; border: 2px solid #E2E8F0; }
+					.student-name { font-size: 18px; font-weight: bold; color: #334155; margin-bottom: 15px; }
+					.result-badge { display: inline-block; padding: 8px 20px; border-radius: 30px; font-size: 24px; font-weight: 900; letter-spacing: 1px; }
+					.badge-pass { background: #D1FAE5; color: #059669; border: 2px solid #34D399; }
+					.badge-unpass { background: #FEE2E2; color: #DC2626; border: 2px solid #F87171; }
+
+					.date-section { margin-top: 30px; text-align: left; background: #FFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #E5E7EB;}
+					.date-section h3 { font-size: 15px; color: #1E3A8A; margin-top: 0; margin-bottom: 15px; text-align: center;}
+					.instruction { font-size: 13px; color: #6B7280; text-align: center; margin-bottom: 20px; word-break: keep-all; line-height: 1.5; }
+
+					.btn-date { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; color: #1E3A8A; background-color: #EFF6FF; border: 2px solid #BFDBFE; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+					.btn-date:hover { background-color: #DBEAFE; }
+
+					.success-msg { display: none; margin-top: 20px; padding: 20px; background: #ECFDF5; border: 2px solid #6EE7B7; border-radius: 12px; color: #065F46; font-weight: bold; font-size: 15px; }
+					.error-msg { margin-top: 50px; font-weight: bold; color: #EF4444; }
+				</style>
+
+				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+			</head>
+	<body>
+
+		<div class="app-container" id="mainContainer" style="display: none;">
+			<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
+				<h1 class="brand-title">BORN 영어학원</h1>
+				<div style="color: #6C757D; font-size: 14px; font-weight: 600;">성취도 평가 결과 안내</div>
+
+				<div class="result-box">
+					<div class="student-name" id="displayStudentName"></div>
+					<div id="displayResult" class="result-badge"></div>
+				</div>
+
+				<!-- 학부모님이 날짜를 선택하는 구역 -->
+				<div class="date-section" id="dateSelectionArea">
+					<h3>🗓️ 일정 확인 및 선택</h3>
+					<div class="instruction">
+						안내를 위한 일정을 확인하시고,<br>원하시는 날짜를 아래 버튼을 눌러 확정해 주세요.
+            </div>
+
+					<button class="btn-date" id="btnDate1" onclick="submitChoice(1)"></button>
+					<button class="btn-date" id="btnDate2" onclick="submitChoice(2)"></button>
+				</div>
+
+				<!-- 이미 선택을 완료했을 때 뜨는 구역 -->
+				<div class="success-msg" id="successArea">
+					✅ <span id="confirmedDate"></span><br>일정 확정이 완료되었습니다. 감사합니다!
+        
+				</div>
+			</div>
+
+		<div id="errorContainer" class="error-msg" style="display: none;">
+			잘못된 접근입니다. 올바른 링크로 다시 접속해 주세요.
+		</div>
+
+		<script>
+			const firebaseConfig = {
+			apiKey: "AIzaSyCti-4AKWT9kbq_a-HEy0AI-CwfxiZ5Msw",
+			authDomain: "bornacademy-713f5.firebaseapp.com",
+			projectId: "bornacademy-713f5",
+			storageBucket: "bornacademy-713f5.firebasestorage.app",
+			messagingSenderId: "767227866395",
+			appId: "1:767227866395:web:b0e0e22a1b21a52d10b7be"
+			};
+			firebase.initializeApp(firebaseConfig);
+			const db = firebase.firestore();
+
+			let docId = "";
+			let option1 = "";
+			let option2 = "";
+
+			window.onload = function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			docId = urlParams.get('id'); // 선생님이 링크에 숨겨둔 고유 ID를 찾습니다.
+
+			if (!docId) {
+			document.getElementById('errorContainer').style.display = "block";
+			} else {
+			loadAssessmentInfo();
+			}
+			};
+
+			function loadAssessmentInfo() {
+			db.collection("assessments").doc(docId).get().then((doc) => {
+			if (!doc.exists) {
+			document.getElementById('errorContainer').style.display = "block";
+			return;
+			}
+
+			const data = doc.data();
+			document.getElementById('mainContainer').style.display = "block";
+
+			// 1. 학생 이름 및 결과 띄우기
+			document.getElementById('displayStudentName').innerText = `${data.name} 학생 평가 결과`;
+			const resultBadge = document.getElementById('displayResult');
+			resultBadge.innerText = data.result;
+			if(data.result === 'PASS') {
+			resultBadge.classList.add('badge-pass');
+			} else {
+			resultBadge.classList.add('badge-unpass');
+			}
+
+			// 2. 날짜 선택 버튼 띄우기 (또는 이미 선택했으면 결과만 띄우기)
+			if (data.parentChoice) {
+			// 이미 학부모님이 응답한 상태라면 버튼을 숨기고 확정 안내문만 보여줍니다.
+			document.getElementById('dateSelectionArea').style.display = "none";
+			document.getElementById('confirmedDate').innerText = data.parentChoice;
+			document.getElementById('successArea').style.display = "block";
+			} else {
+			option1 = data.dateOption1;
+			option2 = data.dateOption2;
+			document.getElementById('btnDate1').innerText = `👉 ${option1} 선택하기`;
+			document.getElementById('btnDate2').innerText = `👉 ${option2} 선택하기`;
+			}
+			}).catch(error => {
+			document.getElementById('errorContainer').style.display = "block";
+			});
+			}
+
+			// 학부모님이 버튼을 눌렀을 때 DB에 저장하는 함수
+			function submitChoice(choiceNum) {
+			const chosenDate = choiceNum === 1 ? option1 : option2;
+
+			if (confirm(`'${chosenDate}' 일정을 확정하시겠습니까?`)) {
+			db.collection("assessments").doc(docId).update({
+			parentChoice: chosenDate
+			}).then(() => {
+			// 성공하면 버튼 구역을 없애고 성공 메시지를 띄웁니다.
+			document.getElementById('dateSelectionArea').style.display = "none";
+			document.getElementById('confirmedDate').innerText = chosenDate;
+			document.getElementById('successArea').style.display = "block";
+			}).catch(error => {
+			alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+			});
+			}
+			}
+		</script>
+	</body>
+</html>
