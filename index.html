@@ -17,7 +17,6 @@
 					}
 					header { text-align: center; margin-bottom: 28px; }
 
-					/* 🚨 시바 로고 스타일 추가 */
 					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
 
 					.brand-title { font-size: 20px; font-weight: 700; color: #2B4C7E; letter-spacing: 1px; margin: 0; }
@@ -40,24 +39,23 @@
 					}
 					.btn-submit:hover { background-color: #1A3256; }
 
-					.nav-links { display: flex; justify-content: center; padding: 0 10px; flex-wrap: wrap; gap: 15px;}
-					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; cursor: pointer;}
+					/* 🚨 하단 메뉴 통일 (양끝 정렬) */
+					.nav-links { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 10px; flex-wrap: wrap; gap: 15px; }
+					.nav-links a { font-size: 13px; color: #6C757D; text-decoration: none; font-weight: 600; cursor: pointer; }
 					.nav-links a:hover { color: #2B4C7E; text-decoration: underline; }
+					.nav-left { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+					.divider { color: #E5E7EB; font-size: 12px; }
 				</style>
-
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 			</head>
 	<body>
-
 		<div class="app-container">
 			<header>
-				<!-- 🚨 여기에 로고 이미지가 들어갔습니다 -->
 				<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
 					<h1 class="brand-title">BORN 영어학원</h1>
 					<div class="brand-subtitle">매일 단어 시험 성적 입력</div>
 				</header>
-
 			<main>
 				<div class="card">
 					<div class="form-group">
@@ -72,12 +70,10 @@
 							<option value="">학생을 선택해주세요</option>
 						</select>
 					</div>
-
 					<div class="form-group">
 						<label>시험 날짜</label>
 						<input type="date" id="testDate">
                 </div>
-
 					<div class="score-row">
 						<div class="form-group">
 							<label>만점 기준</label>
@@ -88,15 +84,21 @@
 							<input type="number" id="score" placeholder="예: 95">
                     </div>
 					</div>
-
 					<button class="btn-submit" onclick="saveScore()">오늘 점수 저장하기</button>
 				</div>
 
+				<!-- 🚨 깔끔하게 좌우로 분리된 하단 메뉴 -->
 				<div class="nav-links">
-					<a href="manage.html">⚙️ 반/학생 관리</a>
-					<a href="report.html">📊 성적 결과 확인</a>
-					<a href="master.html">👑 원장실</a>
-					<a onclick="logout()" style="color: #EF4444;">🚪 로그아웃</a>
+					<div class="nav-left">
+						<a href="manage.html">⚙️ 반/학생 관리</a>
+						<span class="divider">|</span>
+						<a href="report.html">📊 주간 성적</a>
+						<span class="divider">|</span>
+						<a href="achievement.html">🏅 성취도 평가</a>
+						<span class="divider">|</span>
+						<a href="master.html">👑 원장실</a>
+					</div>
+					<a onclick="logout()" style="color: #EF4444; font-weight: bold;">🚪 로그아웃</a>
 				</div>
 			</main>
 		</div>
