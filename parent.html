@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>BORN 영어학원 주간 성적표</title>
+				<title>본 영어학원 주간 성적표</title>
 				<style>
 					body {
 					margin: 0; padding: 0;
@@ -18,6 +18,7 @@
 					}
 					header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #F0F2F5; padding-bottom: 15px;}
 
+					/* 🚨 시바 로고 160px 유지 */
 					.logo-img { width: 160px; height: auto; margin-bottom: 10px; border-radius: 12px; }
 
 					.brand-title { font-size: 18px; font-weight: 700; color: #1E3A8A; margin: 0; }
@@ -49,16 +50,14 @@
 
 					.error-msg { text-align: center; font-size: 15px; font-weight: bold; color: #EF4444; margin-top: 50px; }
 				</style>
-
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 				<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 			</head>
 	<body>
-
 		<div class="app-container" id="mainContainer" style="display: none;">
 			<header>
-				<img src="KakaoTalk_20260808_183941740_01.png" alt="BORN 영어학원 로고" class="logo-img">
-					<h1 class="brand-title">BORN 영어학원</h1>
+				<img src="KakaoTalk_20260808_183941740_01.png" alt="본 영어학원 로고" class="logo-img">
+					<h1 class="brand-title">본 영어학원</h1>
 					<div class="student-title" id="headerStudentName">학생 주간 성적표</div>
 				</header>
 
@@ -109,8 +108,6 @@
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
 			studentName = urlParams.get('name');
-
-			// 🚨 링크에 선생님이 심어둔 특정 날짜(&date=)가 있는지 확인합니다!
 			const specificDate = urlParams.get('date');
 
 			if (!studentName) {
@@ -118,7 +115,6 @@
 			} else {
 			document.getElementById('headerStudentName').innerText = `🏆 ${studentName} 학생 주간 성적표`;
 
-			// 🚨 선생님이 보낸 링크에 날짜가 있으면 그 주로 이동하고, 없으면 그냥 오늘(이번 주)을 보여줍니다.
 			if (specificDate) {
 			currentViewDate = new Date(specificDate);
 			} else {
@@ -150,13 +146,11 @@
 			const weekDates = [];
 			for (let i = 0; i < 5; i++) {
                 const curr = new Date(monday);
-                curr.setDate(monday.getDate() + i);
-                
+                curr.setDate(monday.getDate() + i);                
                 const yyyy = curr.getFullYear();
                 const mm = String(curr.getMonth() + 1).padStart(2, '0');
                 const dd = String(curr.getDate()).padStart(2, '0');
-                const dateString = `${yyyy}-${mm}-${dd}`;
-                
+                const dateString = `${yyyy}-${mm}-${dd}`;                
                 weekDates.push(dateString); 
             }
 
