@@ -31,7 +31,6 @@
 					.success-msg { display: none; margin-top: 20px; padding: 20px; background: #ECFDF5; border: 2px solid #6EE7B7; border-radius: 12px; color: #065F46; font-weight: bold; font-size: 15px; line-height: 1.5; }
 					.error-msg { margin-top: 50px; font-weight: bold; color: #EF4444; border: 1px solid #FCA5A5; background: #FEF2F2; padding: 20px; border-radius: 12px; line-height: 1.6;}
 
-					/* 🚨 하얀 화면 방지용 로딩 메시지 스타일 */
 					.loading-msg { margin-top: 100px; font-size: 16px; font-weight: bold; color: #6C757D; text-align: center; width: 100%; }
 				</style>
 
@@ -40,10 +39,10 @@
 			</head>
 	<body>
 
-		<!-- 🚨 빈 화면 대신 가장 먼저 보이는 로딩 구역 -->
 		<div id="loadingContainer" class="loading-msg">
-			⏳ 평가 결과를 안전하게 불러오는 중입니다...
-		</div>
+			⏳ 평가 결과를 안전하게 불러오는 중입니다...<br>
+				<span style="font-size:12px; color:#9CA3AF; margin-top:10px; display:block; font-weight:normal;">잠시만 기다려 주세요.</span>
+			</div>
 
 		<div class="app-container" id="mainContainer" style="display: none;">
 			<img src="KakaoTalk_20260808_183941740_01.png" alt="본 영어학원 로고" class="logo-img">
@@ -74,12 +73,28 @@
 
 		<div class="app-container" id="errorContainer" style="display: none;">
 			<div class="error-msg">
-				⚠️ 잘못된 접근이거나 삭제된 내역입니다.<br>
+				⚠️ 결과 화면을 불러오지 못했습니다.<br>
 					<span id="errorReason" style="font-size: 13px; color: #9CA3AF; font-weight: normal; margin-top: 10px; display: block;"></span>
 				</div>
 		</div>
 
 		<script>
+			function showError(reason) {
+			document.getElementById('loadingContainer').style.display = "none";
+			document.getElementById('mainContainer').style.display = "none";
+			document.getElementById('errorContainer').style.display = "block";
+			document.getElementById('errorReason').innerText = reason;
+			}
+
+			// 🚨 안전장치: 5초 동안 파이어베이스 데이터를 못 가져오면 코드가 꼬이거나 인터넷이 끊긴 것으로 판단하고 에러를 띄웁니다.
+			const timeoutSafety = setTimeout(() => {
+			const loader = document.getElementById('loadingContainer');
+			if (loader && loader.style.display !== 'none') {
+			showError("오류 원인: 인터넷 연결이 불안정하거나 자바스크립트 코드 일부가 누락되었습니다. 원장님께 다시 문의해 주세요.");
+			}
+			}, 5000);
+
+			try {
 			const firebaseConfig = {
 			apiKey: "AIzaSyCti-4AKWT9kbq_a-HEy0AI-CwfxiZ5Msw",
 			authDomain: "bornacademy-713f5.firebaseapp.com",
@@ -89,42 +104,28 @@
 			appId: "1:767227866395:web:b0e0e22a1b21a52d10b7be"
 			};
 
-			try {
 			firebase.initializeApp(firebaseConfig);
-			} catch(e) {
-			console.error("Firebase Init Error", e);
-			}
-
 			const db = firebase.firestore();
 
 			let docId = "";
 			let option1 = "";
 			let option2 = "";
 
-			function showError(reason) {
-			document.getElementById('loadingContainer').style.display = "none";
-			document.getElementById('mainContainer').style.display = "none";
-			document.getElementById('errorContainer').style.display = "block";
-			document.getElementById('errorReason').innerText = reason;
-			}
-
 			window.onload = function() {
-			try {
 			const urlParams = new URLSearchParams(window.location.search);
 			docId = urlParams.get('id');
 
 			if (!docId) {
+			clearTimeout(timeoutSafety);
 			showError("오류 원인: 주소창에 학생 고유 ID가 없습니다. 선생님이 보내주신 원본 링크 전체를 복사해서 열어주세요.");
 			} else {
 			loadAssessmentInfo();
-			}
-			} catch (e) {
-			showError("오류 원인: 스크립트 실행 중 에러가 발생했습니다. (" + e.message + ")");
 			}
 			};
 
 			function loadAssessmentInfo() {
 			db.collection("assessments").doc(docId).get().then((doc) => {
+			clearTimeout(timeoutSafety); // 정상 작동 시 타임아웃 해제
 			document.getElementById('loadingContainer').style.display = "none";
 
 			if (!doc.exists) {
@@ -175,6 +176,7 @@
 					}
 					}
 					}).catch(error => {
+					clearTimeout(timeoutSafety);
 					showError("오류 원인: 데이터를 불러오는 중 통신 오류가 발생했습니다. (" + error.message + ")");
 					});
 					}
@@ -190,11 +192,15 @@
 
 					const successArea = document.getElementById('successArea');
 					successArea.innerHTML = `✅ <span style="color:#1E3A8A;">${chosenDate}</span><br>일정 확정이 완료되었습니다. 감사합니다!`;
-                    successArea.style.display = "block";
-                }).catch(error => {
-                    alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-                });
+                        successArea.style.display = "block";
+                    }).catch(error => {
+                        alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                    });
+                }
             }
+        } catch (error) {
+            clearTimeout(timeoutSafety);
+            showError("오류 원인: 스크립트 설정에 문제가 있습니다. 코드를 덮어씌울 때 일부가 누락되었습니다.");
         }
     
 		</script>
