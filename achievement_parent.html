@@ -18,8 +18,9 @@
 					.badge-pass { background: #D1FAE5; color: #059669; border: 2px solid #34D399; }
 					.badge-unpass { background: #FEE2E2; color: #DC2626; border: 2px solid #F87171; }
 
-					.teacher-comment { font-size: 14px; color: #4B5563; background: #FFF; border: 1px solid #CBD5E1; padding: 12px 15px; border-radius: 8px; text-align: left; line-height: 1.5; white-space: pre-wrap;}
-					.teacher-comment b { color: #1E3A8A; display: block; margin-bottom: 5px; font-size: 13px;}
+					/* 🚨 코멘트 박스: 상하 여백을 타이트하게 조이고, 글자 간격도 콤팩트하게 다듬었습니다. */
+					.teacher-comment { font-size: 14px; color: #334155; background: #FFF; border: 1px solid #CBD5E1; padding: 10px 12px; border-radius: 8px; text-align: left; line-height: 1.4; white-space: pre-wrap; word-break: keep-all; }
+					.teacher-comment b { color: #1E3A8A; display: block; margin-bottom: 4px; font-size: 13px;}
 
 					.date-section { margin-top: 30px; text-align: left; background: #FFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #E5E7EB;}
 					.date-section h3 { font-size: 15px; color: #1E3A8A; margin-top: 0; margin-bottom: 15px; text-align: center;}
@@ -150,7 +151,6 @@
 			document.getElementById('dateSelectionArea').style.display = "none";
 
 			const successArea = document.getElementById('successArea');
-			// 🚨 텍스트를 백틱(`)으로 감싸서 줄바꿈 오류를 완전히 차단했습니다
 			successArea.innerHTML = `✅ 훌륭하게 통과했습니다!<br>
 				다음 단계에서도 좋은 결과 있기를 응원합니다!`;
 				successArea.style.display = "block";
