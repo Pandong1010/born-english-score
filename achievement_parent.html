@@ -18,7 +18,6 @@
 					.badge-pass { background: #D1FAE5; color: #059669; border: 2px solid #34D399; }
 					.badge-unpass { background: #FEE2E2; color: #DC2626; border: 2px solid #F87171; }
 
-					/* 🚨 코멘트 박스: 상하 여백을 타이트하게 조이고, 글자 간격도 콤팩트하게 다듬었습니다. */
 					.teacher-comment { font-size: 14px; color: #334155; background: #FFF; border: 1px solid #CBD5E1; padding: 10px 12px; border-radius: 8px; text-align: left; line-height: 1.4; white-space: pre-wrap; word-break: keep-all; }
 					.teacher-comment b { color: #1E3A8A; display: block; margin-bottom: 4px; font-size: 13px;}
 
@@ -60,8 +59,8 @@
 					<div class="instruction">
 						안내를 위한 일정을 확인하시고,<br>원하시는 날짜를 아래 버튼을 눌러 확정해 주세요.
             </div>
-					<button class="btn-date" id="btnDate1" onclick="submitChoice(1)"></button>
-					<button class="btn-date" id="btnDate2" onclick="submitChoice(2)"></button>
+					<!-- 🚨 여기에 날짜 개수만큼 버튼이 동적으로 생성됩니다 -->
+					<div id="dynamicButtonsArea"></div>
 				</div>
 				<div class="success-msg" id="successArea"></div>
 			</div>
@@ -105,8 +104,6 @@
 			const db = firebase.firestore();
 
 			let docId = "";
-			let option1 = "";
-			let option2 = "";
 
 			window.onload = function() {
 			const urlParams = new URLSearchParams(window.location.search);
@@ -166,10 +163,24 @@
 					successArea.style.display = "block";
 					} else {
 					document.getElementById('dateSelectionArea').style.display = "block";
-					option1 = data.dateOption1;
-					option2 = data.dateOption2;
-					document.getElementById('btnDate1').innerText = `👉 ${option1} 선택하기`;
-					document.getElementById('btnDate2').innerText = `👉 ${option2} 선택하기`;
+
+					// 🚨 날짜가 몇 개든 유동적으로 버튼을 생성합니다
+					let dates = data.dateOptions || [];
+					if (dates.length === 0) { // 예전 데이터 호환용
+					if(data.dateOption1) dates.push(data.dateOption1);
+					if(data.dateOption2) dates.push(data.dateOption2);
+					}
+
+					const btnArea = document.getElementById('dynamicButtonsArea');
+					btnArea.innerHTML = '';
+
+					dates.forEach(dateStr => {
+					const btn = document.createElement('button');
+					btn.className = 'btn-date';
+					btn.innerText = `👉 ${dateStr} 선택하기`;
+					btn.onclick = function() { submitChoice(dateStr); };
+					btnArea.appendChild(btn);
+					});
 					}
 					}
 					}).catch(error => {
@@ -178,9 +189,7 @@
 					});
 					}
 
-					function submitChoice(choiceNum) {
-					const chosenDate = choiceNum === 1 ? option1 : option2;
-
+					function submitChoice(chosenDate) {
 					if (confirm(`'${chosenDate}' 일정을 확정하시겠습니까?`)) {
 					db.collection("assessments").doc(docId).update({
 					parentChoice: chosenDate
